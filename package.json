@@ -1,0 +1,26 @@
+{
+  "name": "sellora-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SELLORA - Enterprise Grade E-Commerce Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm --workspace=@sellora/api run dev",
+    "dev:web": "npm --workspace=@sellora/web run dev",
+    "build:shared": "npm --workspace=@sellora/shared-types run build && npm --workspace=@sellora/shared-validators run build",
+    "build:api": "npm --workspace=@sellora/api run build",
+    "build:web": "npm --workspace=@sellora/web run build",
+    "typecheck": "npx tsc --project packages/shared-types/tsconfig.json && npx tsc --project packages/shared-validators/tsconfig.json && npx tsc --project apps/api/tsconfig.json && npx tsc --project apps/web/tsconfig.json",
+    "db:seed": "npm --workspace=@sellora/api run db:seed",
+    "db:indexes": "npm --workspace=@sellora/api run db:indexes"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

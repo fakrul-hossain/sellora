@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-lightest: #EDF1D6;
+  --brand-light: #9DC08B;
+  --brand-primary: #609966;
+  --brand-dark: #40513B;
+  --brand-primary-hover: #528457;
+  --brand-dark-hover: #33412f;
+
+
+  --font-inter: 'Inter', sans-serif;
+  --font-bengali: 'Noto Sans Bengali', sans-serif;
+  --bg-color: #FAFAFA;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--brand-dark);
+  font-family: var(--font-inter), var(--font-bengali), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for Horizontal Sliders */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Brand Utility Classes */
+.bg-brand-lightest {
+  background-color: var(--brand-lightest);
+}
+
+.bg-brand-light {
+  background-color: var(--brand-light);
+}
+
+.bg-brand-primary {
+  background-color: var(--brand-primary);
+}
+
+.bg-brand-dark {
+  background-color: var(--brand-dark);
+}
+
+.text-brand-lightest {
+  color: var(--brand-lightest);
+}
+
+.text-brand-light {
+  color: var(--brand-light);
+}
+
+.text-brand-primary {
+  color: var(--brand-primary);
+}
+
+.text-brand-dark {
+  color: var(--brand-dark);
+}
+
+.border-brand-lightest {
+  border-color: var(--brand-lightest);
+}
+
+.border-brand-light {
+  border-color: var(--brand-light);
+}
+
+.border-brand-primary {
+  border-color: var(--brand-primary);
+}
+
+.border-brand-dark {
+  border-color: var(--brand-dark);
+}
+
+/* Brand Action Buttons */
+.brand-btn-primary {
+  background-color: var(--brand-primary);
+  color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+
+.brand-btn-primary:hover {
+  background-color: var(--brand-primary-hover);
+}
+
+.brand-btn-dark {
+  background-color: var(--brand-dark);
+  color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+
+.brand-btn-dark:hover {
+  background-color: var(--brand-dark-hover);
+}
