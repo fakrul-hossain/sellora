@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApiClient } from '@/lib/api-client';
 import { useToast } from '@/components/ui/toast';
-import { PlusCircle, ArrowLeft, Save, Package } from 'lucide-react';
+import { CloudinaryImageUploader, RichTextEditor } from '@/components/common';
+import { PlusCircle, ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AddProductPage() {
@@ -24,6 +25,11 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!imageUrl) {
+      toast.error('Please upload or enter a product image', 'Image Required');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -64,11 +70,11 @@ export default function AddProductPage() {
             <span>Create New Marketplace Listing</span>
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Add a new product to your vendor store catalog for customers across Bangladesh.
+            Add a new product with Cloudinary image upload and rich formatting details.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs font-bold">
+        <form onSubmit={handleSubmit} className="space-y-6 text-xs font-bold">
           <div>
             <label className="block text-slate-700 mb-1">Product Title *</label>
             <input
@@ -149,27 +155,22 @@ export default function AddProductPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-slate-700 mb-1">Image URL *</label>
-            <input
-              type="url"
-              required
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary font-mono text-[11px]"
-            />
-          </div>
+          {/* Cloudinary Image Uploader */}
+          <CloudinaryImageUploader
+            label="Featured Product Image (Cloudinary) *"
+            value={imageUrl}
+            onChange={setImageUrl}
+            folder="products"
+            placeholder="Click or drag product image to upload to Cloudinary"
+          />
 
-          <div>
-            <label className="block text-slate-700 mb-1">Product Description</label>
-            <textarea
-              rows={4}
-              placeholder="Describe the key features, specifications, and details of your item..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary"
-            />
-          </div>
+          {/* Free Rich Text Editor */}
+          <RichTextEditor
+            label="Product Description (Rich Text Editor)"
+            value={description}
+            onChange={setDescription}
+            placeholder="Write key features, specifications, and warranty details..."
+          />
 
           <div className="pt-4 flex justify-end">
             <button

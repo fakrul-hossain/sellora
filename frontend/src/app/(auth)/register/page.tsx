@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/auth-context';
 import { ApiClient } from '@/lib/api-client';
 import { useToast } from '@/components/ui/toast';
+import { CloudinaryImageUploader } from '@/components/common';
 import { UserPlus, User, Lock, Mail, Store, AlertCircle, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +23,7 @@ function RegisterContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [storeName, setStoreName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +40,7 @@ function RegisterContent() {
         password,
         role,
         storeName: isSeller ? storeName : undefined,
+        avatarUrl: avatarUrl || undefined,
       });
 
       login(data.token, data.user);
@@ -70,7 +73,7 @@ function RegisterContent() {
         <p className="text-xs text-slate-500 font-medium">
           {isSeller
             ? 'Open your official merchant store and reach millions of customers in Bangladesh'
-            : 'Join Bangladesh&apos;s premier tech and lifestyle shopping platform'}
+            : 'Join Bangladesh marketplace platform'}
         </p>
       </div>
 
@@ -150,6 +153,15 @@ function RegisterContent() {
             />
           </div>
         </div>
+
+        {/* Optional Avatar Cloudinary Upload */}
+        <CloudinaryImageUploader
+          label="Profile / Store Avatar (Cloudinary Optional)"
+          value={avatarUrl}
+          onChange={setAvatarUrl}
+          folder="avatars"
+          placeholder="Upload profile photo to Cloudinary"
+        />
 
         <button
           type="submit"

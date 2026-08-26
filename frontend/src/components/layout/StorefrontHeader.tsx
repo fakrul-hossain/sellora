@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/providers/auth-context';
 import { useCart } from '@/providers/cart-context';
+import { useSiteSettings } from '@/hooks/use-site-settings';
 import {
   Search,
   ShoppingCart,
@@ -95,6 +96,7 @@ const CATEGORIES: CategoryItem[] = [
 export function StorefrontHeader() {
   const { user, logout, isVendor, isAdmin } = useAuth();
   const { totalItemsCount, toggleCart } = useCart();
+  const { settings } = useSiteSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isCategoriesHovered, setIsCategoriesHovered] = useState(false);
@@ -108,7 +110,11 @@ export function StorefrontHeader() {
     <header className="w-full z-50 bg-white font-sans text-slate-800 border-b border-slate-100 sticky top-0 shadow-xs">
       {/* 1. TOP ANNOUNCEMENT BAR */}
       <div className="bg-brand-dark text-brand-lightest text-xs py-3 px-4 border-b border-brand-dark/20">
-        <div className="max-w-[1536px] mx-auto flex items-center justify-between sm:justify-end gap-4">
+        <div className="max-w-[1536px] mx-auto flex items-center justify-between sm:justify-between gap-4">
+          <div className="hidden sm:block text-[11px] font-medium text-brand-lightest/80 truncate">
+            {settings?.announcementText || '🎉 Welcome to SELLORA! Free Express Shipping on orders over ৳5,000.'}
+          </div>
+
           <div className="flex items-center gap-5 text-[11px] font-bold text-brand-lightest/90 shrink-0 overflow-x-auto scrollbar-hide">
             <Link href="/register?role=SELLER" className="hover:text-brand-light transition-colors whitespace-nowrap">
               Sell With Sellora
@@ -159,11 +165,19 @@ export function StorefrontHeader() {
         <div className="flex items-center gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
-              <ShoppingCart className="w-5 h-5 fill-white stroke-none" />
-            </div>
+            {settings?.siteLogo ? (
+              <img src={settings.siteLogo} alt={settings.siteName || 'Logo'} className="h-9 w-auto object-contain rounded-lg" />
+            ) : (
+              <div className="w-9 h-9 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
+                <ShoppingCart className="w-5 h-5 fill-white stroke-none" />
+              </div>
+            )}
             <span className="text-2xl font-black tracking-tight text-brand-dark leading-none">
-              sell<span className="text-brand-primary">ora</span>
+              {settings?.siteName ? (
+                settings.siteName
+              ) : (
+                <>sell<span className="text-brand-primary">ora</span></>
+              )}
             </span>
           </Link>
 

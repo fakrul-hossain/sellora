@@ -89,9 +89,8 @@ export function AppSidebar({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all ${
-                  isActive ? activeClass : hoverClass
-                }`}
+                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all ${isActive ? activeClass : hoverClass
+                  }`}
               >
                 <ItemIcon className={`w-4 h-4 ${isActive ? 'text-white' : isSlateTheme ? 'text-slate-400' : 'text-brand-light'}`} />
                 <span>{item.label}</span>
@@ -109,9 +108,8 @@ export function AppSidebar({
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${
-                isSlateTheme ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-brand-lightest/70 hover:text-white hover:bg-white/10'
-              }`}
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${isSlateTheme ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-brand-lightest/70 hover:text-white hover:bg-white/10'
+                }`}
             >
               <LinkIcon className="w-4 h-4" />
               <span>{link.label}</span>

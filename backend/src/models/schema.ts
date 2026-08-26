@@ -200,11 +200,16 @@ export class DatabaseSchema {
       `CREATE TABLE IF NOT EXISTS site_settings (
         id INT AUTO_INCREMENT PRIMARY KEY,
         site_name VARCHAR(255) DEFAULT 'SELLORA Bangladesh',
+        site_logo VARCHAR(500) DEFAULT NULL,
         support_phone VARCHAR(50) DEFAULT '+880 9612-345678',
         support_email VARCHAR(255) DEFAULT 'support@sellora.com',
         announcement_text TEXT DEFAULT NULL,
         default_commission_rate DECIMAL(5,2) DEFAULT 5.00,
         banners_json JSON DEFAULT NULL,
+        hero_config_json JSON DEFAULT NULL,
+        brand_week_config_json JSON DEFAULT NULL,
+        categories_config_json JSON DEFAULT NULL,
+        brands_config_json JSON DEFAULT NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,

@@ -4,49 +4,45 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Apple, Play } from 'lucide-react';
 import Link from 'next/link';
+import { useSiteSettings } from '@/hooks/use-site-settings';
 
-const HERO_SLIDES = [
+const DEFAULT_HERO_SLIDES = [
   {
     id: 1,
-    title: 'FLASH SALE',
-    brand: 'Bata',
-    discount: 'Flat 25% off',
-    time: '3:00 - 9:00 PM',
-    prepayment: 'Up to 15% Pre-payment Savings',
-    delivery: 'FREE DELIVERY',
-    image: '/banners/hero_bata_flash_sale.png',
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1200',
+    slug: '/campaigns/tech-mega-sale',
   },
   {
     id: 2,
-    title: 'MEGA TECH DEALS',
-    brand: 'SELLORA',
-    discount: 'Up to 40% off',
-    time: 'Limited Time Offer',
-    prepayment: 'Instant Bank Cashback',
-    delivery: 'FREE EXPRESS SHIPPING',
-    image: '/banners/hero_tech_flash_sale.png',
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200',
+    slug: '/campaigns/ultrabook-deals',
   },
 ];
 
 export function StorefrontHero() {
+  const { settings } = useSiteSettings();
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const heroSlides = settings?.heroConfig?.slides && settings.heroConfig.slides.length > 0
+    ? settings.heroConfig.slides
+    : DEFAULT_HERO_SLIDES;
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [heroSlides.length]);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
 
   return (
     <section className="py-4 font-sans">
       <div className="max-w-[1536px] mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
         
-        {/* Left Main Slider (8 or 9 columns out of 12) */}
-        <div className="lg:col-span-9 relative rounded-2xl overflow-hidden shadow-sm bg-stone-100 min-h-[340px] sm:min-h-[380px] lg:min-h-[420px] flex items-center">
+        {/* Left Main Slider — Pure 100% Un-obscured Image Banner */}
+        <div className="lg:col-span-9 relative rounded-2xl overflow-hidden shadow-sm bg-stone-100 min-h-[300px] sm:min-h-[360px] lg:min-h-[400px] flex items-center group">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -56,47 +52,20 @@ export function StorefrontHero() {
               transition={{ duration: 0.4 }}
               className="absolute inset-0 w-full h-full"
             >
-              <img
-                src={HERO_SLIDES[currentSlide].image}
-                alt={HERO_SLIDES[currentSlide].title}
-                className="w-full h-full object-cover object-center"
-              />
-
-              {/* Overlay Content */}
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-900/40 via-transparent to-transparent flex flex-col justify-center p-6 sm:p-10 pointer-events-none">
-                <div className="max-w-md space-y-2 text-white drop-shadow-md">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl sm:text-2xl font-black text-brand-primary bg-white px-2 py-0.5 rounded-md italic">
-                      {HERO_SLIDES[currentSlide].brand}
-                    </span>
-                    <span className="text-2xl sm:text-4xl font-black tracking-tight text-white">
-                      {HERO_SLIDES[currentSlide].title}
-                    </span>
-                  </div>
-                  <div className="inline-block bg-brand-primary text-white text-xs sm:text-sm font-black px-3 py-1 rounded-full">
-                    {HERO_SLIDES[currentSlide].discount}
-                  </div>
-                  <p className="text-xs sm:text-sm font-bold text-slate-100">
-                    {HERO_SLIDES[currentSlide].time}
-                  </p>
-
-                  <div className="pt-2 flex flex-wrap items-center gap-2 text-[11px] font-extrabold">
-                    <span className="bg-brand-primary text-white px-2.5 py-1 rounded-md">
-                      {HERO_SLIDES[currentSlide].prepayment}
-                    </span>
-                    <span className="bg-brand-lightest text-brand-dark px-2.5 py-1 rounded-md uppercase">
-                      {HERO_SLIDES[currentSlide].delivery}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <Link href={heroSlides[currentSlide]?.slug || '/products'} className="block w-full h-full cursor-pointer">
+                <img
+                  src={heroSlides[currentSlide]?.image}
+                  alt={`Hero Banner ${currentSlide + 1}`}
+                  className="w-full h-full object-cover object-center group-hover:scale-[1.01] transition-transform duration-500 ease-out"
+                />
+              </Link>
             </motion.div>
           </AnimatePresence>
 
           {/* Left Arrow Button */}
           <button
             onClick={prevSlide}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/70 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
             aria-label="Previous Slide"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -105,7 +74,7 @@ export function StorefrontHero() {
           {/* Right Arrow Button */}
           <button
             onClick={nextSlide}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/70 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
             aria-label="Next Slide"
           >
             <ChevronRight className="w-5 h-5" />
@@ -113,29 +82,23 @@ export function StorefrontHero() {
 
           {/* Bottom Pagination Dots */}
           <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-1.5 z-10">
-            {HERO_SLIDES.map((_, idx) => (
+            {heroSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
                 className={`h-2 rounded-full transition-all cursor-pointer ${
-                  currentSlide === idx ? 'w-5 bg-brand-primary' : 'w-2 bg-white/70 hover:bg-white'
+                  currentSlide === idx ? 'w-6 bg-brand-primary' : 'w-2 bg-white/80 hover:bg-white'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
           </div>
-
-          <span className="absolute bottom-2 right-4 text-[9px] font-bold text-slate-600/80 z-10">
-            *T&Cs Apply
-          </span>
         </div>
 
         {/* Right App Download Promo Card */}
         <div className="lg:col-span-3 rounded-2xl overflow-hidden bg-gradient-to-b from-brand-lightest via-brand-light/30 to-brand-primary/20 p-5 flex flex-col justify-between shadow-xs border border-brand-light/40 relative">
-          {/* Card Top */}
           <div className="space-y-3">
             <div className="bg-brand-dark text-white p-4 rounded-2xl shadow-md text-center relative overflow-hidden">
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-brand-light rounded-full blur-md opacity-40"></div>
               <p className="text-xs font-bold text-brand-lightest uppercase tracking-wider">Download the App &</p>
               <h3 className="text-xl sm:text-2xl font-black leading-tight text-white mt-0.5">
                 GET ৳250 OFF
@@ -144,7 +107,6 @@ export function StorefrontHero() {
             </div>
           </div>
 
-          {/* QR Code & Store Links Container */}
           <div className="bg-white/90 backdrop-blur-xs rounded-2xl p-4 border border-white shadow-xs space-y-3 mt-4 text-center">
             <div className="flex items-center gap-3 justify-center">
               <div className="w-16 h-16 bg-white p-1 rounded-lg border border-slate-200 shadow-xs shrink-0 flex items-center justify-center">
@@ -152,15 +114,12 @@ export function StorefrontHero() {
                   <rect x="0" y="0" width="30" height="30" rx="3" />
                   <rect x="5" y="5" width="20" height="20" fill="white" />
                   <rect x="10" y="10" width="10" height="10" />
-                  
                   <rect x="70" y="0" width="30" height="30" rx="3" />
                   <rect x="75" y="5" width="20" height="20" fill="white" />
                   <rect x="80" y="10" width="10" height="10" />
-
                   <rect x="0" y="70" width="30" height="30" rx="3" />
                   <rect x="5" y="75" width="20" height="20" fill="white" />
                   <rect x="10" y="80" width="10" height="10" />
-
                   <rect x="40" y="10" width="15" height="15" />
                   <rect x="40" y="40" width="20" height="20" />
                   <rect x="70" y="40" width="15" height="15" />
@@ -172,12 +131,11 @@ export function StorefrontHero() {
 
               <div className="text-left space-y-1">
                 <p className="text-xs font-extrabold text-brand-dark leading-tight">
-                  Scan the QR code & get it now!
+                  Scan QR code & get it now!
                 </p>
               </div>
             </div>
 
-            {/* Store Buttons */}
             <div className="flex items-center gap-2 pt-1">
               <Link
                 href="#"
@@ -185,7 +143,7 @@ export function StorefrontHero() {
               >
                 <Apple className="w-4 h-4 fill-white" />
                 <div className="text-left leading-none">
-                  <span className="text-[8px] block text-brand-lightest/80 font-medium">Available on the</span>
+                  <span className="text-[8px] block text-brand-lightest/80 font-medium">Available on</span>
                   <span className="text-[10px] font-extrabold block">App Store</span>
                 </div>
               </Link>
@@ -208,4 +166,4 @@ export function StorefrontHero() {
       </div>
     </section>
   );
-}
+}

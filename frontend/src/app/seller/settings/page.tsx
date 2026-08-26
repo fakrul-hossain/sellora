@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { ApiClient } from '@/lib/api-client';
 import { useToast } from '@/components/ui/toast';
+import { CloudinaryImageUploader } from '@/components/common';
 import { Store, Save } from 'lucide-react';
 
 export default function SellerSettingsPage() {
@@ -69,11 +70,11 @@ export default function SellerSettingsPage() {
           <span>Vendor Store Profile & Branding Settings</span>
         </h1>
         <p className="text-xs text-slate-500 font-medium mt-1">
-          Customize your storefront name, logo, promotional banner, and customer contact details.
+          Upload store logo and banner images via Cloudinary.
         </p>
       </div>
 
-      <form onSubmit={handleSave} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-4 text-xs font-bold">
+      <form onSubmit={handleSave} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-6 text-xs font-bold">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-slate-700 mb-1">Store Name *</label>
@@ -108,26 +109,22 @@ export default function SellerSettingsPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-slate-700 mb-1">Logo Image URL</label>
-            <input
-              type="url"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary font-mono text-[11px]"
-            />
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <CloudinaryImageUploader
+            label="Store Logo Image (Cloudinary)"
+            value={logoUrl}
+            onChange={setLogoUrl}
+            folder="seller_logos"
+            placeholder="Upload Store Logo"
+          />
 
-          <div>
-            <label className="block text-slate-700 mb-1">Store Banner Image URL</label>
-            <input
-              type="url"
-              value={bannerUrl}
-              onChange={(e) => setBannerUrl(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary font-mono text-[11px]"
-            />
-          </div>
+          <CloudinaryImageUploader
+            label="Store Banner Image (Cloudinary)"
+            value={bannerUrl}
+            onChange={setBannerUrl}
+            folder="seller_banners"
+            placeholder="Upload Store Banner"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

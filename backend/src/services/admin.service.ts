@@ -32,7 +32,7 @@ export class AdminService {
       }
     });
 
-    const platformCommission = Math.round(totalRevenue * 0.05); // 5% default marketplace commission
+    const platformCommission = Math.round(totalRevenue * 0.05);
     const sellerRevenue = totalRevenue - platformCommission;
 
     const recentOrders = allOrders.slice(0, 5).map((o) => ({
@@ -94,7 +94,6 @@ export class AdminService {
     const user = await UserRepository.findById(userId);
     if (!user) throw AppError.notFound('User account not found');
 
-    const sql = `UPDATE users SET role = ? WHERE id = ?`;
     await UserRepository.updateRole(userId, role);
 
     await ActivityLogRepository.create({
@@ -189,23 +188,29 @@ export class AdminService {
 
   public static async getSiteSettings() {
     const doc = await SiteSettingsRepository.getSettings();
-    let banners: any[] = [];
-    if (doc.banners_json) {
+
+    const safeParse = (val: any) => {
+      if (!val) return null;
       try {
-        banners = typeof doc.banners_json === 'string' ? JSON.parse(doc.banners_json) : doc.banners_json;
+        return typeof val === 'string' ? JSON.parse(val) : val;
       } catch {
-        banners = [];
+        return null;
       }
-    }
+    };
 
     return {
       id: String(doc.id),
       siteName: doc.site_name,
+      siteLogo: doc.site_logo || '',
       supportPhone: doc.support_phone,
       supportEmail: doc.support_email,
       announcementText: doc.announcement_text,
       defaultCommissionRate: Number(doc.default_commission_rate),
-      banners,
+      banners: safeParse(doc.banners_json) || [],
+      heroConfig: safeParse(doc.hero_config_json) || null,
+      brandWeekConfig: safeParse(doc.brand_week_config_json) || null,
+      categoriesConfig: safeParse(doc.categories_config_json) || [],
+      brandsConfig: safeParse(doc.brands_config_json) || [],
       createdAt: doc.created_at,
       updatedAt: doc.updated_at,
     };
@@ -214,11 +219,16 @@ export class AdminService {
   public static async updateSiteSettings(input: any, adminName: string = 'Admin') {
     await SiteSettingsRepository.updateSettings({
       site_name: input.siteName,
+      site_logo: input.siteLogo,
       support_phone: input.supportPhone,
       support_email: input.supportEmail,
       announcement_text: input.announcementText,
       default_commission_rate: input.defaultCommissionRate,
       banners: input.banners,
+      hero_config: input.heroConfig,
+      brand_week_config: input.brandWeekConfig,
+      categories_config: input.categoriesConfig,
+      brands_config: input.brandsConfig,
     });
 
     await ActivityLogRepository.create({

@@ -5,6 +5,8 @@ import { productRoutes } from './product.routes.js';
 import { orderRoutes } from './order.routes.js';
 import { vendorRoutes } from './vendor.routes.js';
 import { adminRoutes } from './admin.routes.js';
+import { siteSettingsRoutes } from './site-settings.routes.js';
+import { uploadRoutes } from './upload.routes.js';
 
 const router = Router();
 
@@ -14,5 +16,7 @@ router.use('/products', productRoutes);
 router.use('/orders', orderRoutes);
 router.use('/vendors', vendorRoutes);
 router.use('/admin', adminRoutes);
+router.use('/site-settings', siteSettingsRoutes);
+router.use('/upload', uploadRoutes);
 
 export default router;
