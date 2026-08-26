@@ -7,7 +7,7 @@ export interface UserRow extends RowDataPacket {
   email: string;
   password_hash: string;
   phone: string;
-  role: 'CUSTOMER' | 'SELLER' | 'ADMIN' | 'SUPER_ADMIN';
+  role: 'CUSTOMER' | 'SELLER' | 'ADMIN' | 'SUPER_ADMIN' | 'MODERATOR' | 'ORDER_MANAGER';
   avatar_url?: string;
   is_email_verified: number;
   vendor_id?: string;
@@ -43,6 +43,11 @@ export class UserRepository {
     return rows.length > 0 ? rows[0] : null;
   }
 
+  public static async findAll(): Promise<UserRow[]> {
+    const sql = `SELECT * FROM users ORDER BY created_at DESC`;
+    return await mysqlClient.query<UserRow[]>(sql);
+  }
+
   public static async create(user: {
     name: string;
     email: string;
@@ -67,6 +72,12 @@ export class UserRepository {
     const created = await this.findById(result.insertId);
     if (!created) throw new Error('Failed to retrieve newly created user.');
     return created;
+  }
+
+  public static async updateRole(userId: number | string, role: string): Promise<void> {
+    const numericId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+    const sql = `UPDATE users SET role = ? WHERE id = ?`;
+    await mysqlClient.execute(sql, [role, numericId]);
   }
 
   public static async updateVendorId(userId: number | string, vendorId: string): Promise<void> {

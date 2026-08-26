@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AppProviders } from '@/providers/app-providers';
-import { StorefrontFooter, StorefrontHeader } from '@/components/layout';
+import { StorefrontLayoutShell } from '@/components/layout/StorefrontLayoutShell';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 
 export const metadata: Metadata = {
@@ -22,9 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-primary selection:text-white flex flex-col">
         <AppProviders>
-          <StorefrontHeader />
-          <main className="flex-1 flex flex-col">{children}</main>
-          <StorefrontFooter />
+          <StorefrontLayoutShell>{children}</StorefrontLayoutShell>
           <CartDrawer />
         </AppProviders>
       </body>

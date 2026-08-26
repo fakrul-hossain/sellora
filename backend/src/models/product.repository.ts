@@ -158,6 +158,15 @@ export class ProductRepository {
     return await this.findById(numericId);
   }
 
+  public static async updateStock(productId: number | string, vendorId: number | string, newStock: number): Promise<boolean> {
+    const numericId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
+    const numericVendorId = typeof vendorId === 'string' ? parseInt(vendorId, 10) : vendorId;
+
+    const sql = `UPDATE products SET stock = ? WHERE id = ? AND vendor_id = ?`;
+    const result = await mysqlClient.execute(sql, [newStock, numericId, numericVendorId]);
+    return result.affectedRows > 0;
+  }
+
   public static async delete(id: number | string, vendorId: number | string): Promise<boolean> {
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
     const numericVendorId = typeof vendorId === 'string' ? parseInt(vendorId, 10) : vendorId;
@@ -197,6 +206,19 @@ export class ProductRepository {
     } else {
       const sql = `SELECT COUNT(*) as count FROM products`;
       const rows = await mysqlClient.query<RowDataPacket[]>(sql);
+      return rows[0]?.count || 0;
+    }
+  }
+
+  public static async countLowStock(vendorId?: number | string, threshold: number = 5): Promise<number> {
+    if (vendorId) {
+      const numericVendorId = typeof vendorId === 'string' ? parseInt(vendorId, 10) : vendorId;
+      const sql = `SELECT COUNT(*) as count FROM products WHERE vendor_id = ? AND stock <= ?`;
+      const rows = await mysqlClient.query<RowDataPacket[]>(sql, [numericVendorId, threshold]);
+      return rows[0]?.count || 0;
+    } else {
+      const sql = `SELECT COUNT(*) as count FROM products WHERE stock <= ?`;
+      const rows = await mysqlClient.query<RowDataPacket[]>(sql, [threshold]);
       return rows[0]?.count || 0;
     }
   }

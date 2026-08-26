@@ -4,3 +4,4 @@ export * from './LoadingSkeleton';
 export * from './EmptyState';
 export * from './ErrorState';
 export * from './MotionWrapper';
+export * from './AppSidebar';

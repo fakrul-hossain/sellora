@@ -2,17 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { ApiClient } from '@/lib/api-client';
-import { Settings, Save, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Settings, Save, CheckCircle2 } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 export default function AdminSiteSettingsPage() {
+  const toast = useToast();
   const [siteName, setSiteName] = useState('SELLORA Bangladesh');
   const [supportPhone, setSupportPhone] = useState('+880 9612-345678');
   const [supportEmail, setSupportEmail] = useState('support@sellora.com');
   const [announcementText, setAnnouncementText] = useState('🎉 Welcome to SELLORA! Free Express Shipping on orders over ৳5,000.');
   const [defaultCommissionRate, setDefaultCommissionRate] = useState('5.0');
-
   const [isLoading, setIsLoading] = useState(true);
-  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -36,7 +36,6 @@ export default function AdminSiteSettingsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage(null);
     try {
       await ApiClient.put('/admin/site-settings', {
         siteName,
@@ -45,28 +44,23 @@ export default function AdminSiteSettingsPage() {
         announcementText,
         defaultCommissionRate: parseFloat(defaultCommissionRate),
       });
-      setMessage('Site settings updated successfully!');
+      toast.success('Site settings updated successfully!', 'Settings Saved');
     } catch (err: any) {
-      alert(err.message || 'Failed to update site settings');
+      toast.error(err.message || 'Failed to update site settings', 'Save Failed');
     }
   };
 
   return (
-    <div className="space-y-6 font-sans max-w-4xl">
-      <div className="border-b border-slate-200 pb-4">
-        <h1 className="text-2xl font-black text-brand-dark flex items-center gap-2">
-          <Settings className="w-6 h-6 text-brand-primary" />
-          Site & Platform Settings Management
+    <div className="space-y-6 font-sans max-w-4xl text-slate-800 antialiased">
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+        <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-brand-primary" />
+          <span>Site & Platform Settings Management</span>
         </h1>
-        <p className="text-xs text-slate-500 font-medium">Configure global platform announcements, commission rates, and support details</p>
+        <p className="text-xs text-slate-500 font-medium mt-1">
+          Configure global platform announcements, commission rates, and support details
+        </p>
       </div>
-
-      {message && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>{message}</span>
-        </div>
-      )}
 
       <form onSubmit={handleSave} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-4 text-xs font-bold">
         <div>

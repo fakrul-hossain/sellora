@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { ApiClient } from '@/lib/api-client';
-import { Store, CheckCircle, ShieldAlert, XCircle, Search } from 'lucide-react';
+import { Store, Search } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 export default function AdminVendorsPage() {
+  const toast = useToast();
   const [vendors, setVendors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -27,23 +29,26 @@ export default function AdminVendorsPage() {
   const handleUpdateStatus = async (vendorId: string, status: string) => {
     try {
       await ApiClient.put(`/admin/vendors/${vendorId}/status`, { status });
+      toast.success(`Vendor status updated to ${status}`, 'Status Updated');
       fetchVendors();
     } catch (err: any) {
-      alert(err.message || 'Failed to update vendor status');
+      toast.error(err.message || 'Failed to update vendor status', 'Update Failed');
     }
   };
 
   return (
-    <div className="space-y-6 font-sans">
-      <div className="border-b border-slate-200 pb-4">
-        <h1 className="text-2xl font-black text-brand-dark flex items-center gap-2">
-          <Store className="w-6 h-6 text-brand-primary" />
-          Vendor Store Moderation & Approvals
+    <div className="space-y-6 font-sans text-slate-800 antialiased">
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+        <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
+          <Store className="w-5 h-5 text-brand-primary" />
+          <span>Vendor Store Moderation & Approvals</span>
         </h1>
-        <p className="text-xs text-slate-500 font-medium">Verify business registration status and toggle store permissions across SELLORA</p>
+        <p className="text-xs text-slate-500 font-medium mt-1">
+          Verify business registration status and toggle store permissions across SELLORA
+        </p>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xs overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
         {isLoading ? (
           <div className="py-12 text-center text-xs font-bold text-slate-500">Loading vendor list...</div>
         ) : vendors.length === 0 ? (
@@ -51,7 +56,7 @@ export default function AdminVendorsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider font-extrabold border-b border-slate-200">
+              <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider font-extrabold border-b border-slate-200 text-[10px]">
                 <tr>
                   <th className="p-4">Store Name</th>
                   <th className="p-4">Email / Phone</th>

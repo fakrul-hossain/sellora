@@ -14,7 +14,7 @@ export class DatabaseSchema {
         email VARCHAR(255) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
         phone VARCHAR(50) DEFAULT '',
-        role ENUM('CUSTOMER', 'SELLER', 'ADMIN', 'SUPER_ADMIN') NOT NULL DEFAULT 'CUSTOMER',
+        role ENUM('CUSTOMER', 'SELLER', 'ADMIN', 'SUPER_ADMIN', 'MODERATOR', 'ORDER_MANAGER', 'CONTENT_MANAGER', 'SUPPORT_AGENT') NOT NULL DEFAULT 'CUSTOMER',
         avatar_url VARCHAR(500) DEFAULT NULL,
         is_email_verified TINYINT(1) DEFAULT 1,
         vendor_id VARCHAR(100) DEFAULT NULL,
@@ -207,6 +207,46 @@ export class DatabaseSchema {
         banners_json JSON DEFAULT NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+      `CREATE TABLE IF NOT EXISTS activity_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT DEFAULT NULL,
+        user_name VARCHAR(255) DEFAULT 'System',
+        action VARCHAR(100) NOT NULL,
+        module VARCHAR(100) NOT NULL,
+        target_id VARCHAR(100) DEFAULT NULL,
+        details_json JSON DEFAULT NULL,
+        ip_address VARCHAR(50) DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_activity_action (action),
+        INDEX idx_activity_module (module)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+      `CREATE TABLE IF NOT EXISTS coupons (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        code VARCHAR(100) NOT NULL UNIQUE,
+        discount_type ENUM('PERCENTAGE', 'FIXED') NOT NULL DEFAULT 'PERCENTAGE',
+        discount_value DECIMAL(12,2) NOT NULL,
+        min_spend DECIMAL(12,2) DEFAULT 0.00,
+        max_discount DECIMAL(12,2) DEFAULT NULL,
+        is_active TINYINT(1) DEFAULT 1,
+        valid_till DATETIME DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_coupons_code (code)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+      `CREATE TABLE IF NOT EXISTS vendor_withdrawals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        vendor_id INT NOT NULL,
+        amount DECIMAL(12,2) NOT NULL,
+        payment_method VARCHAR(50) NOT NULL,
+        account_details VARCHAR(255) NOT NULL,
+        status ENUM('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED') DEFAULT 'PENDING',
+        transaction_ref VARCHAR(255) DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE CASCADE,
+        INDEX idx_withdrawals_vendor (vendor_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
     ];
 
