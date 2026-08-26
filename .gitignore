@@ -13,6 +13,7 @@ dist/
 .env.*
 !.env.example
 
+
 # Logs
 logs/
 *.log
@@ -29,3 +30,7 @@ Thumbs.db
 # Coverage & testing
 coverage/
 .nyc_output/
+
+# temp files
+deleted
+docs

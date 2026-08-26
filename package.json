@@ -3,19 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "description": "SELLORA - Enterprise Grade E-Commerce Platform",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev:api": "npm --workspace=@sellora/api run dev",
-    "dev:web": "npm --workspace=@sellora/web run dev",
-    "build:shared": "npm --workspace=@sellora/shared-types run build && npm --workspace=@sellora/shared-validators run build",
-    "build:api": "npm --workspace=@sellora/api run build",
-    "build:web": "npm --workspace=@sellora/web run build",
-    "typecheck": "npx tsc --project packages/shared-types/tsconfig.json && npx tsc --project packages/shared-validators/tsconfig.json && npx tsc --project apps/api/tsconfig.json && npx tsc --project apps/web/tsconfig.json",
-    "db:seed": "npm --workspace=@sellora/api run db:seed",
-    "db:indexes": "npm --workspace=@sellora/api run db:indexes"
+    "dev": "npm --prefix backend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "typecheck:backend": "npm --prefix backend run typecheck",
+    "typecheck:frontend": "npm --prefix frontend run typecheck",
+    "typecheck": "npm run typecheck:backend && npm run typecheck:frontend",
+    "db:seed": "npm --prefix backend run db:seed",
+    "db:indexes": "npm --prefix backend run db:indexes"
   },
   "devDependencies": {
     "typescript": "^5.5.4"
