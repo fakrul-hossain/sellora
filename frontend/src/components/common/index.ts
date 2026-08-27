@@ -8,3 +8,4 @@ export * from './AppSidebar';
 export * from './CloudinaryImageUploader';
 export * from './RichTextEditor';
 export * from './MarketplaceProductCard';
+export * from './CommonProductCard';

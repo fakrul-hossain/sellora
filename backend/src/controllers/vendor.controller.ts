@@ -58,4 +58,9 @@ export class VendorController {
     const list = await VendorService.listWithdrawals(vendorProfile.id);
     return ApiResponseBuilder.success(res, 'Withdrawal requests fetched', list);
   };
+
+  public static getPublicStore = async (req: Request, res: Response) => {
+    const storeData = await VendorService.getPublicStore(req.params.id);
+    return ApiResponseBuilder.success(res, 'Vendor store details fetched', storeData);
+  };
 }

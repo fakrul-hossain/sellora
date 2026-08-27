@@ -3,6 +3,7 @@ import { OrderRepository } from '../models/order.repository.js';
 import { ProductRepository } from '../models/product.repository.js';
 import { VendorWithdrawalRepository } from '../models/vendor-withdrawal.repository.js';
 import { AppError } from '../utils/app-error.js';
+import { ProductService } from './product.service.js';
 
 export class VendorService {
   private static formatVendor(row: VendorRow) {
@@ -225,5 +226,23 @@ export class VendorService {
       throw AppError.notFound('Vendor store not found');
     }
     return this.formatVendor(updated);
+  }
+
+  public static async getPublicStore(idOrSlug: string) {
+    let vendor = await VendorRepository.findBySlug(idOrSlug);
+    if (!vendor) {
+      const numericId = parseInt(idOrSlug, 10);
+      if (!isNaN(numericId)) {
+        vendor = await VendorRepository.findById(numericId);
+      }
+    }
+    if (!vendor) {
+      throw AppError.notFound('Vendor store not found');
+    }
+    const products = await ProductService.listProducts({ vendorId: String(vendor.id) });
+    return {
+      store: this.formatVendor(vendor),
+      products,
+    };
   }
 }

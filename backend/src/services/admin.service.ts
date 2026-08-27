@@ -155,7 +155,7 @@ export class AdminService {
   }
 
   public static async listProducts() {
-    const products = await ProductRepository.findAll({});
+    const products = await ProductRepository.findAll({ includeUnapproved: true });
     return products.map((p) => ({
       id: String(p.id),
       vendorId: String(p.vendor_id),
@@ -169,6 +169,23 @@ export class AdminService {
       isApproved: Boolean(p.is_approved),
       createdAt: p.created_at,
     }));
+  }
+
+  public static async approveProduct(productId: string, isApproved: boolean = true, adminName: string = 'Admin') {
+    const updated = await ProductRepository.updateApprovalStatus(productId, isApproved);
+    if (!updated) {
+      throw AppError.notFound('Product not found');
+    }
+
+    await ActivityLogRepository.create({
+      userName: adminName,
+      action: isApproved ? 'ADMIN_APPROVED_PRODUCT' : 'ADMIN_REJECTED_PRODUCT',
+      module: 'PRODUCTS',
+      targetId: productId,
+      details: { title: updated.title, isApproved },
+    });
+
+    return { id: String(updated.id), title: updated.title, isApproved: Boolean(updated.is_approved) };
   }
 
   public static async listOrders() {

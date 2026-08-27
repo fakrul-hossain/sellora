@@ -34,4 +34,16 @@ export class ProductController {
     await ProductService.deleteProduct(req.params.id, vendorId);
     return ApiResponseBuilder.success(res, 'Product deleted successfully');
   };
+
+  public static getQuestions = async (req: Request, res: Response) => {
+    const questions = await ProductService.getQuestions(req.params.id);
+    return ApiResponseBuilder.success(res, 'Product Q&A fetched successfully', questions);
+  };
+
+  public static addQuestion = async (req: Request, res: Response) => {
+    const { userName, question } = req.body;
+    const author = userName || req.user?.name || 'Customer';
+    const created = await ProductService.addQuestion(req.params.id, author, question);
+    return ApiResponseBuilder.created(res, 'Question submitted successfully', created);
+  };
 }

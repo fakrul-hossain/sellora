@@ -17,6 +17,7 @@ router.get('/vendors', asyncHandler(AdminController.listVendors));
 router.put('/vendors/:id/status', asyncHandler(AdminController.updateVendorStatus));
 
 router.get('/products', asyncHandler(AdminController.listProducts));
+router.put('/products/:id/approve', asyncHandler(AdminController.approveProduct));
 router.get('/orders', asyncHandler(AdminController.listOrders));
 
 router.get('/site-settings', asyncHandler(AdminController.getSiteSettings));

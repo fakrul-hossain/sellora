@@ -94,6 +94,10 @@ export class DatabaseSchema {
         discount_percentage DECIMAL(5,2) DEFAULT 0.00,
         stock INT NOT NULL DEFAULT 0,
         image_url VARCHAR(500) NOT NULL,
+        video_url VARCHAR(500) DEFAULT NULL,
+        specifications_json JSON DEFAULT NULL,
+        in_the_box TEXT DEFAULT NULL,
+        warranty VARCHAR(255) DEFAULT NULL,
         features_json JSON DEFAULT NULL,
         rating DECIMAL(3,2) DEFAULT 4.80,
         review_count INT DEFAULT 12,
@@ -253,10 +257,39 @@ export class DatabaseSchema {
         FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE CASCADE,
         INDEX idx_withdrawals_vendor (vendor_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+      `CREATE TABLE IF NOT EXISTS product_questions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        product_id INT NOT NULL,
+        user_name VARCHAR(255) NOT NULL,
+        question TEXT NOT NULL,
+        answer TEXT DEFAULT NULL,
+        answered_by VARCHAR(255) DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        INDEX idx_questions_product (product_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
     ];
 
     for (const sql of ddlStatements) {
       await pool.query(sql);
+    }
+
+    // Safely add missing columns to products table if it already exists
+    const alterQueries = [
+      "ALTER TABLE products ADD COLUMN video_url VARCHAR(500) DEFAULT NULL",
+      "ALTER TABLE products ADD COLUMN specifications_json JSON DEFAULT NULL",
+      "ALTER TABLE products ADD COLUMN in_the_box TEXT DEFAULT NULL",
+      "ALTER TABLE products ADD COLUMN warranty VARCHAR(255) DEFAULT NULL",
+    ];
+
+    for (const alterSql of alterQueries) {
+      try {
+        await pool.query(alterSql);
+      } catch (err: any) {
+        // Column may already exist, ignore duplicate column error
+      }
     }
 
     logger.info('MySQL relational database schema tables & indexes verified successfully.');

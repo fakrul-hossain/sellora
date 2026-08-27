@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Check, Heart, CreditCard, Sparkles } from 'lucide-react';
+import { ShoppingCart, Check, Heart, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ProductDetailItem } from '@/lib/products-data';
 import { useCart } from '@/providers/cart-context';
@@ -11,14 +11,12 @@ interface ProductPurchaseActionsProps {
   product: ProductDetailItem;
   selectedColorName?: string;
   selectedVersionName?: string;
-  onOpenEMICalculator: () => void;
 }
 
 export function ProductPurchaseActions({
   product,
   selectedColorName,
   selectedVersionName,
-  onOpenEMICalculator,
 }: ProductPurchaseActionsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
@@ -38,7 +36,7 @@ export function ProductPurchaseActions({
   };
 
   return (
-    <div className="space-y-4 pt-2">
+    <div className="space-y-4 pt-2 font-sans">
       {/* Quantity Picker & Wishlist */}
       <div className="flex items-center justify-between gap-4 p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
         <div className="flex items-center gap-3">
@@ -76,7 +74,7 @@ export function ProductPurchaseActions({
           }`}
           title="Add to Wishlist"
         >
-          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-brand-primary' : ''}`} />
+          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-brand-primary text-brand-primary' : ''}`} />
           <span className="hidden sm:inline">{isWishlisted ? 'Saved' : 'Wishlist'}</span>
         </button>
       </div>
@@ -90,7 +88,7 @@ export function ProductPurchaseActions({
           onClick={handleAddToCart}
           className={`flex-1 py-4 px-6 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-md cursor-pointer ${
             isAdded
-              ? 'bg-brand-primary text-white'
+              ? 'bg-emerald-600 text-white'
               : 'bg-brand-primary hover:bg-brand-primary-hover text-white shadow-brand-primary/25 hover:shadow-lg'
           }`}
         >
@@ -112,21 +110,12 @@ export function ProductPurchaseActions({
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleBuyNow}
-          className="flex-1 py-4 px-6 rounded-2xl bg-brand-dark hover:bg-brand-dark-hover text-white font-black text-xs sm:text-sm transition-all shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2"
+          className="flex-1 py-4 px-6 rounded-2xl bg-brand-dark hover:bg-slate-900 text-white font-black text-xs sm:text-sm transition-all shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2"
         >
-          <Sparkles className="w-4 h-4 text-brand-lightest" />
-          <span>BUY NOW (EXPRESS)</span>
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          <span>BUY NOW (CHECKOUT)</span>
         </motion.button>
       </div>
-
-      {/* Buy on EMI Button */}
-      <button
-        onClick={onOpenEMICalculator}
-        className="w-full py-3 px-4 rounded-2xl border-2 border-brand-dark text-brand-dark font-extrabold text-xs hover:bg-brand-dark hover:text-white transition-all cursor-pointer flex items-center justify-center gap-2"
-      >
-        <CreditCard className="w-4 h-4 text-brand-primary" />
-        <span>BUY ON EASY 0% EMI</span>
-      </button>
     </div>
   );
 }

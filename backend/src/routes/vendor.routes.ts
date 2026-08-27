@@ -6,6 +6,8 @@ import { asyncHandler } from '../middleware/async-handler.js';
 
 const router = Router();
 
+router.get('/store/:id', asyncHandler(VendorController.getPublicStore));
+
 router.use(authenticate, authorizeRoles(UserRole.SELLER, UserRole.ADMIN, UserRole.SUPER_ADMIN));
 
 router.get('/profile', asyncHandler(VendorController.getProfile));

@@ -11,6 +11,10 @@ export const createProductSchema = z.object({
   sku: z.string().min(3, 'SKU is required'),
   imageUrl: z.string().min(1, 'Main image is required'),
   images: z.array(z.string()).default([]),
+  videoUrl: z.string().optional(),
+  specifications: z.any().optional(),
+  inTheBox: z.string().optional(),
+  warranty: z.string().optional(),
   features: z.array(z.string()).default([]),
 });
 

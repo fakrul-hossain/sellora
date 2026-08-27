@@ -11,40 +11,71 @@ import {
   MessageSquare,
   ThumbsUp,
   CheckCircle,
-  Download,
-  Filter,
   Search,
-  ChevronDown,
 } from 'lucide-react';
 import { ProductDetailItem } from '@/lib/products-data';
 
 interface ProductTabsSectionProps {
-  product: ProductDetailItem;
+  product: ProductDetailItem & {
+    inTheBox?: string;
+    warranty?: string;
+    specifications?: any;
+  };
 }
 
 export function ProductTabsSection({ product }: ProductTabsSectionProps) {
   const [activeTab, setActiveTab] = useState<
-    'description' | 'specs' | 'box' | 'warranty' | 'reviews' | 'qna' | 'downloads'
+    'description' | 'specs' | 'box' | 'warranty' | 'reviews' | 'qna'
   >('description');
 
   const [reviewFilterRating, setReviewFilterRating] = useState<number | null>(null);
   const [qnaSearch, setQnaSearch] = useState('');
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
+  const [newQuestionText, setNewQuestionText] = useState('');
+  const [questions, setQuestions] = useState(product.questionsList || [
+    {
+      id: 'q1',
+      author: 'Tanvir Hossain',
+      date: 'Yesterday',
+      question: 'Is this official Bangladesh warranty or shop warranty?',
+      answer: product.warranty ? `It comes with ${product.warranty}.` : 'It comes with official brand manufacturer warranty support.',
+      answeredBy: `${product.brand || 'Official'} Support Team`,
+      answerDate: 'Today',
+    },
+  ]);
 
   const filteredReviews = reviewFilterRating
     ? product.reviewsList?.filter((r) => r.rating === reviewFilterRating)
     : product.reviewsList;
 
   const filteredQuestions = qnaSearch
-    ? product.questionsList?.filter(
+    ? questions.filter(
         (q) =>
           q.question.toLowerCase().includes(qnaSearch.toLowerCase()) ||
           q.answer?.toLowerCase().includes(qnaSearch.toLowerCase())
       )
-    : product.questionsList;
+    : questions;
+
+  const handleAskSubmit = () => {
+    if (!newQuestionText.trim()) return;
+    setQuestions([
+      {
+        id: `q-${Date.now()}`,
+        author: 'You',
+        date: 'Just now',
+        question: newQuestionText,
+        answer: 'Thank you for your question! Seller will answer shortly.',
+        answeredBy: `${product.brand || 'Store'} Support`,
+        answerDate: 'Pending',
+      },
+      ...questions,
+    ]);
+    setNewQuestionText('');
+    setIsAskModalOpen(false);
+  };
 
   return (
-    <div id="product-tabs" className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+    <div id="product-tabs" className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden font-sans">
       {/* Sticky Tab Navigation Bar */}
       <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 flex items-center gap-2 sm:gap-6 overflow-x-auto scrollbar-none">
         <button
@@ -116,19 +147,7 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
           }`}
         >
           <MessageSquare className="w-4 h-4" />
-          <span>Q&A ({product.qnaCount || 24})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('downloads')}
-          className={`py-4 text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all border-b-2 whitespace-nowrap cursor-pointer ${
-            activeTab === 'downloads'
-              ? 'border-brand-primary text-brand-primary'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Download className="w-4 h-4" />
-          <span>Downloads</span>
+          <span>Q&A ({questions.length})</span>
         </button>
       </div>
 
@@ -145,20 +164,22 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
               className="space-y-6 text-sm text-slate-700 leading-relaxed font-normal"
             >
               <div className="prose prose-slate max-w-none space-y-4">
-                <p className="text-base text-slate-800 font-medium">{product.description}</p>
+                <div dangerouslySetInnerHTML={{ __html: product.description }} className="text-base text-slate-800 font-medium leading-relaxed" />
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-slate-100">
-                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Product Features Overview</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {product.features.map((feat, idx) => (
-                    <div key={idx} className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-2.5">
-                      <span className="w-2 h-2 rounded-full bg-brand-primary mt-1.5 shrink-0" />
-                      <span className="text-xs font-bold text-slate-800">{feat}</span>
-                    </div>
-                  ))}
+              {product.features && product.features.length > 0 && (
+                <div className="space-y-3 pt-4 border-t border-slate-100">
+                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Product Features Overview</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {product.features.map((feat, idx) => (
+                      <div key={idx} className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-brand-primary mt-1.5 shrink-0" />
+                        <span className="text-xs font-bold text-slate-800">{feat}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           )}
 
@@ -171,15 +192,15 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-8"
             >
-              {product.specifications && product.specifications.length > 0 ? (
-                product.specifications.map((group, gIdx) => (
+              {Array.isArray(product.specifications) && product.specifications.length > 0 ? (
+                product.specifications.map((group: any, gIdx: number) => (
                   <div key={gIdx} className="space-y-3">
                     <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider bg-slate-100 px-3 py-1.5 rounded-lg inline-block">
-                      {group.category}
+                      {group.category || 'Technical Specifications'}
                     </h4>
 
                     <div className="rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
-                      {group.items.map((item, iIdx) => (
+                      {group.items?.map((item: any, iIdx: number) => (
                         <div
                           key={iIdx}
                           className={`grid grid-cols-1 sm:grid-cols-12 p-3.5 text-xs ${
@@ -196,8 +217,9 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
               ) : (
                 <div className="rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100 text-xs">
                   <div className="grid grid-cols-12 p-4 bg-white"><span className="col-span-4 font-bold">Brand</span><span className="col-span-8">{product.brand}</span></div>
-                  <div className="grid grid-cols-12 p-4 bg-slate-50"><span className="col-span-4 font-bold">SKU</span><span className="col-span-8">{product.sku}</span></div>
-                  <div className="grid grid-cols-12 p-4 bg-white"><span className="col-span-4 font-bold">Warranty</span><span className="col-span-8">{product.warranty}</span></div>
+                  <div className="grid grid-cols-12 p-4 bg-slate-50"><span className="col-span-4 font-bold">SKU Code</span><span className="col-span-8">{product.sku}</span></div>
+                  <div className="grid grid-cols-12 p-4 bg-white"><span className="col-span-4 font-bold">Warranty</span><span className="col-span-8">{product.warranty || 'Official Brand Warranty'}</span></div>
+                  <div className="grid grid-cols-12 p-4 bg-slate-50"><span className="col-span-4 font-bold">Category</span><span className="col-span-8">{product.category}</span></div>
                 </div>
               )}
             </motion.div>
@@ -213,19 +235,29 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
               className="space-y-6"
             >
               <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Package Contents Included</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {product.boxContents?.map((item, bIdx) => (
-                  <div key={bIdx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-brand-lightest text-brand-primary flex items-center justify-center font-bold text-xs">
-                        {bIdx + 1}
+              {product.inTheBox ? (
+                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs font-extrabold text-slate-800 leading-relaxed">
+                  {product.inTheBox}
+                </div>
+              ) : product.boxContents && product.boxContents.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {product.boxContents.map((item, bIdx) => (
+                    <div key={bIdx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-brand-lightest text-brand-primary flex items-center justify-center font-bold text-xs">
+                          {bIdx + 1}
+                        </div>
+                        <span className="text-xs font-extrabold text-slate-900">{item.title}</span>
                       </div>
-                      <span className="text-xs font-extrabold text-slate-900">{item.title}</span>
+                      <span className="text-xs font-bold text-brand-primary bg-brand-lightest px-2.5 py-1 rounded-full">{item.quantity}</span>
                     </div>
-                    <span className="text-xs font-bold text-brand-primary bg-brand-lightest px-2.5 py-1 rounded-full">{item.quantity}</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-600">
+                  1x {product.title}, 1x User Manual & Warranty Card
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -241,7 +273,7 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
               <div className="p-6 rounded-3xl bg-brand-lightest/50 border border-brand-light/40 flex items-start gap-4">
                 <Shield className="w-8 h-8 text-brand-primary shrink-0 mt-1" />
                 <div className="space-y-2">
-                  <h4 className="text-sm font-black text-brand-dark">{product.warranty}</h4>
+                  <h4 className="text-sm font-black text-brand-dark">{product.warranty || 'Official Brand Warranty Included'}</h4>
                   <p className="text-xs text-slate-600 leading-relaxed font-normal">
                     All products purchased on SELLORA come with official brand manufacturer warranty support. In case of any technical or hardware defect during the warranty period, bring or send your item to any SELLORA Express Hub across Bangladesh for instant diagnostics and unit replacement.
                   </p>
@@ -282,35 +314,6 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
                     <div className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden"><div className="w-[10%] h-full bg-amber-400" /></div>
                     <span>10%</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span>3 Stars</span>
-                    <div className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden"><div className="w-[3%] h-full bg-amber-400" /></div>
-                    <span>3%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Review Filter */}
-              <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-slate-500" />
-                  <span className="text-xs font-bold text-slate-800">Filter Ratings:</span>
-                  <button
-                    onClick={() => setReviewFilterRating(null)}
-                    className={`px-3 py-1 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
-                      reviewFilterRating === null ? 'bg-brand-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    All ({product.reviewCount})
-                  </button>
-                  <button
-                    onClick={() => setReviewFilterRating(5)}
-                    className={`px-3 py-1 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
-                      reviewFilterRating === 5 ? 'bg-brand-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    5 Stars
-                  </button>
                 </div>
               </div>
 
@@ -330,33 +333,10 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                            <div className="flex items-center text-amber-400">
-                              {[...Array(rev.rating)].map((_, i) => (
-                                <Star key={i} className="w-3 h-3 fill-amber-400" />
-                              ))}
-                            </div>
-                            <span>•</span>
-                            <span>{rev.date}</span>
-                          </div>
                         </div>
                       </div>
-
-                      <button className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-brand-primary font-bold cursor-pointer">
-                        <ThumbsUp className="w-3.5 h-3.5" />
-                        <span>Helpful ({rev.likes})</span>
-                      </button>
                     </div>
-
                     <p className="text-xs text-slate-700 font-normal leading-relaxed">{rev.comment}</p>
-
-                    {rev.photos && rev.photos.length > 0 && (
-                      <div className="flex gap-2 pt-1">
-                        {rev.photos.map((p, idx) => (
-                          <img key={idx} src={p} alt="Review Photo" className="w-16 h-16 rounded-xl object-cover border border-slate-200" />
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -417,30 +397,6 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
               </div>
             </motion.div>
           )}
-
-          {/* Downloads */}
-          {activeTab === 'downloads' && (
-            <motion.div
-              key="downloads"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-4"
-            >
-              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Official Downloads & User Guides</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center justify-between">
-                  <div>
-                    <h5 className="text-xs font-extrabold text-slate-900">User Manual & Pairing Guide (PDF)</h5>
-                    <span className="text-[11px] text-slate-500">2.4 MB • Official English/Bengali</span>
-                  </div>
-                  <button className="px-3 py-1.5 rounded-xl bg-brand-dark text-white font-bold text-xs flex items-center gap-1 cursor-pointer">
-                    <Download className="w-3.5 h-3.5" /> Download
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
 
@@ -451,7 +407,9 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
             <h3 className="text-sm font-black text-slate-900">Ask Question to Seller</h3>
             <textarea
               rows={4}
-              placeholder="Type your question about compatibility, warranty, or delivery..."
+              value={newQuestionText}
+              onChange={(e) => setNewQuestionText(e.target.value)}
+              placeholder="Type your question about compatibility, warranty, or specifications..."
               className="w-full p-3 rounded-2xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-brand-primary"
             />
             <div className="flex justify-end gap-2">
@@ -462,7 +420,7 @@ export function ProductTabsSection({ product }: ProductTabsSectionProps) {
                 Cancel
               </button>
               <button
-                onClick={() => setIsAskModalOpen(false)}
+                onClick={handleAskSubmit}
                 className="px-4 py-2 rounded-xl bg-brand-primary text-white font-bold text-xs cursor-pointer"
               >
                 Submit Question

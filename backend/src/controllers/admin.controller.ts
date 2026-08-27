@@ -37,6 +37,13 @@ export class AdminController {
     return ApiResponseBuilder.success(res, 'Products catalog fetched', products);
   };
 
+  public static approveProduct = async (req: Request, res: Response) => {
+    const { isApproved } = req.body;
+    const adminName = req.user?.name || 'Admin';
+    const result = await AdminService.approveProduct(req.params.id, isApproved !== undefined ? Boolean(isApproved) : true, adminName);
+    return ApiResponseBuilder.success(res, 'Product approval status updated', result);
+  };
+
   public static listOrders = async (req: Request, res: Response) => {
     const orders = await AdminService.listOrders();
     return ApiResponseBuilder.success(res, 'Orders list fetched', orders);

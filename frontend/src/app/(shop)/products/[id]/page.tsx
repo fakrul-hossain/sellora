@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -9,24 +9,22 @@ import {
   Heart,
   ShieldCheck,
   ChevronRight,
-  Sparkles,
   ArrowRight,
+  Store,
 } from 'lucide-react';
 import { getProductById, mockProducts, ColorVariant, OptionVariant } from '@/lib/products-data';
-import { SelloraProductCard } from '@/components/common/SelloraProductCard';
+import { ApiClient } from '@/lib/api-client';
+import { CommonProductCard } from '@/components/common/CommonProductCard';
 
 import {
   ProductGallery,
   ProductPricingCard,
   ProductVariantSelector,
-  ProductDeliveryCard,
   ProductPurchaseActions,
   ProductTrustGrid,
   ProductKeyFeatureCards,
   ProductTabsSection,
-  FrequentlyBoughtTogether,
   StickyPurchaseBar,
-  EMICalculatorModal,
   ShareModal,
 } from '@/features/products/components/detail';
 
@@ -35,7 +33,40 @@ export default function ProductDetailsPage() {
   const router = useRouter();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id || 'remax-200h';
 
-  const product = getProductById(productId);
+  const [productData, setProductData] = useState<any>(() => getProductById(productId));
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch real backend data if available
+  useEffect(() => {
+    async function fetchBackendProduct() {
+      try {
+        const data = await ApiClient.get<any>(`/products/${productId}`);
+        if (data && data.id) {
+          setProductData((prev: any) => ({
+            ...prev,
+            ...data,
+            title: data.title || prev.title,
+            price: data.price ? Number(data.price) : prev.price,
+            originalPrice: data.originalPrice ? Number(data.originalPrice) : prev.originalPrice,
+            stock: data.stock !== undefined ? Number(data.stock) : prev.stock,
+            description: data.description || prev.description,
+            imageUrl: data.imageUrl || prev.imageUrl,
+            videoUrl: data.videoUrl || prev.videoUrl,
+            inTheBox: data.inTheBox || prev.inTheBox,
+            warranty: data.warranty || prev.warranty,
+            specifications: data.specifications || prev.specifications,
+          }));
+        }
+      } catch (err) {
+        // Use local fallback item if numeric ID fetch fails
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBackendProduct();
+  }, [productId]);
+
+  const product = productData;
 
   // Variant States
   const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(
@@ -46,14 +77,10 @@ export default function ProductDetailsPage() {
   );
 
   // Modals
-  const [isEMIOpen, setIsEMIOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
-
-  // Wishlist state
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   const priceDelta = selectedVersion?.priceDelta || 0;
-  const currentPrice = product.price + priceDelta;
 
   const relatedProducts = mockProducts.filter((p) => p.id !== product.id).slice(0, 6);
   const recentlyViewed = mockProducts.filter((p) => p.id !== product.id).slice(2, 6);
@@ -77,11 +104,11 @@ export default function ProductDetailsPage() {
               Home
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <Link href={`/categories?cat=${product.category.toLowerCase()}`} className="hover:text-brand-primary transition-colors shrink-0">
-              {product.category}
+            <Link href={`/categories?cat=${product.category?.toLowerCase() || 'all'}`} className="hover:text-brand-primary transition-colors shrink-0">
+              {product.category || 'Category'}
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="text-slate-400 font-medium shrink-0">{product.brand}</span>
+            <span className="text-slate-400 font-medium shrink-0">{product.brand || 'Brand'}</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span className="font-extrabold text-brand-dark truncate max-w-[240px] sm:max-w-md">
               {product.title}
@@ -114,27 +141,28 @@ export default function ProductDetailsPage() {
                 <ProductTrustGrid />
               </div>
 
-              {/* Shop By Brand Highlight */}
+              {/* Shop By Seller Store Highlight */}
               <div className="p-5 rounded-2xl bg-brand-lightest/40 border border-brand-light/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-brand-light">
                 <div className="flex items-center gap-3.5">
                   <div className="w-12 h-12 rounded-xl bg-brand-dark text-white font-black text-base flex items-center justify-center shrink-0 shadow-sm">
-                    {product.brand.slice(0, 2)}
+                    {product.brand?.slice(0, 2) || 'ST'}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-black text-brand-dark">{product.brand} Store</h4>
-                      <span className="bg-brand-primary text-white text-[10px] font-black px-2 py-0.5 rounded">Verified</span>
+                      <h4 className="text-sm font-black text-brand-dark">{product.brand || 'Official Vendor'} Store</h4>
+                      <span className="bg-brand-primary text-white text-[10px] font-black px-2 py-0.5 rounded">Verified Seller</span>
                     </div>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">98.4% Rating • 100% Authentic Product</p>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => router.push(`/search?q=${product.brand}`)}
-                  className="px-4 py-2 rounded-xl border border-brand-light hover:border-brand-primary bg-white text-brand-dark font-extrabold text-xs transition-all cursor-pointer shrink-0 shadow-2xs"
+                <Link
+                  href={`/store/${product.vendorId || product.brand?.toLowerCase() || '1'}`}
+                  className="px-4 py-2 rounded-xl border border-brand-light hover:border-brand-primary bg-white text-brand-dark font-extrabold text-xs transition-all cursor-pointer shrink-0 shadow-2xs flex items-center gap-1.5"
                 >
-                  Visit Store
-                </button>
+                  <Store className="w-3.5 h-3.5 text-brand-primary" />
+                  <span>Visit Store</span>
+                </Link>
               </div>
             </div>
 
@@ -151,7 +179,7 @@ export default function ProductDetailsPage() {
                     {product.isVerifiedOfficialStore && (
                       <span className="text-[11px] font-bold text-brand-dark bg-brand-lightest/60 border border-brand-light px-2.5 py-1 rounded-lg flex items-center gap-1">
                         <ShieldCheck className="w-3.5 h-3.5 text-brand-primary" />
-                        Authorized Distributor
+                        Authorized Seller
                       </span>
                     )}
                   </div>
@@ -163,7 +191,7 @@ export default function ProductDetailsPage() {
                   {product.title}
                 </h1>
 
-                {/* Inline Rating & Actions */}
+                {/* Inline Rating & Stock */}
                 <div className="flex flex-wrap items-center gap-3 text-xs border-y border-slate-100 py-3 text-slate-600">
                   <div className="flex items-center gap-1 font-black text-amber-500 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/60">
                     <Star className="w-3.5 h-3.5 fill-amber-400" />
@@ -172,7 +200,9 @@ export default function ProductDetailsPage() {
                   </div>
 
                   <span className="text-slate-300">•</span>
-                  <span className="font-extrabold text-slate-800">{product.soldCount || 1420}+ Sold</span>
+                  <span className="font-extrabold text-slate-800">
+                    Available Stock: <span className="text-brand-primary font-black">{product.stock ?? 15} units</span>
+                  </span>
 
                   <div className="ml-auto flex items-center gap-2">
                     <button
@@ -200,59 +230,35 @@ export default function ProductDetailsPage() {
               <ProductPricingCard
                 product={product}
                 priceDelta={priceDelta}
-                onOpenEMICalculator={() => setIsEMIOpen(true)}
               />
 
-              {/* Variant Selector */}
-              <ProductVariantSelector
-                colorVariants={product.colorVariants}
-                selectedColorId={selectedColor?.id}
-                onSelectColor={setSelectedColor}
-                versionVariants={product.versionVariants}
-                selectedVersionId={selectedVersion?.id}
-                onSelectVersion={setSelectedVersion}
-              />
-
-              {/* Delivery & Shipping Info Card */}
-              <ProductDeliveryCard />
+              {/* Variant Selector (Colors & Versions) */}
+              {(product.colorVariants || product.versionVariants) && (
+                <ProductVariantSelector
+                  colorVariants={product.colorVariants}
+                  selectedColorId={selectedColor?.id}
+                  onSelectColor={setSelectedColor}
+                  versionVariants={product.versionVariants}
+                  selectedVersionId={selectedVersion?.id}
+                  onSelectVersion={setSelectedVersion}
+                />
+              )}
 
               {/* Quantity & High-Priority CTAs */}
               <ProductPurchaseActions
                 product={product}
                 selectedColorName={selectedColor?.name}
                 selectedVersionName={selectedVersion?.name}
-                onOpenEMICalculator={() => setIsEMIOpen(true)}
               />
 
             </div>
           </div>
 
-          {/* Interleaved Campaign Promotional Banner */}
-          <div className="rounded-3xl bg-brand-dark p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-brand-dark/20">
-            <div className="space-y-2 text-center md:text-left">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-primary text-white text-xs font-black uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5" /> SELLORA TECH FEST 2026
-              </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white">Get Up To 40% Off Tech Accessories & Free Express Shipping</h3>
-              <p className="text-xs text-brand-lightest/90 font-medium">Use code <span className="font-bold text-brand-light">TECH2026</span> at checkout for extra savings on orders above ৳2,000</p>
-            </div>
-            <button
-              onClick={() => router.push('/categories?cat=electronics')}
-              className="px-6 py-3.5 rounded-2xl bg-brand-lightest text-brand-dark font-black text-xs hover:bg-white transition-all cursor-pointer shrink-0 shadow-md flex items-center gap-2"
-            >
-              <span>Explore Tech Deals</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Frequently Bought Together Bundle Builder */}
-          <FrequentlyBoughtTogether product={product} />
-
-          {/* Product Tabs */}
+          {/* Product Details Tabs (Description, Specifications, In the Box, Warranty, Q&A) */}
           <ProductTabsSection product={product} />
 
-          {/* Related Products Slider */}
-          <div className="space-y-4">
+          {/* Related Products Slider using CommonProductCard */}
+          <div className="space-y-4 pt-4">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs font-extrabold text-brand-primary uppercase tracking-wider">Recommendations</span>
@@ -265,17 +271,17 @@ export default function ProductDetailsPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {relatedProducts.map((rel) => (
-                <SelloraProductCard key={rel.id} product={rel} />
+                <CommonProductCard key={rel.id} product={rel} />
               ))}
             </div>
           </div>
 
-          {/* Recently Viewed Products */}
+          {/* Recently Viewed Products using CommonProductCard */}
           <div className="space-y-4 pt-4 border-t border-slate-200/80">
             <h3 className="text-base font-black text-slate-900">Recently Viewed Items</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
               {recentlyViewed.map((item) => (
-                <SelloraProductCard key={item.id} product={item} />
+                <CommonProductCard key={item.id} product={item} />
               ))}
             </div>
           </div>
@@ -283,14 +289,7 @@ export default function ProductDetailsPage() {
         </div>
       </main>
 
-      {/* Modals */}
-      <EMICalculatorModal
-        productTitle={product.title}
-        price={currentPrice}
-        isOpen={isEMIOpen}
-        onClose={() => setIsEMIOpen(false)}
-      />
-
+      {/* Share Modal */}
       <ShareModal
         productTitle={product.title}
         isOpen={isShareOpen}

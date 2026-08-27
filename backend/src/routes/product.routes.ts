@@ -8,6 +8,8 @@ const router = Router();
 
 router.get('/', asyncHandler(ProductController.list));
 router.get('/:id', asyncHandler(ProductController.getById));
+router.get('/:id/questions', asyncHandler(ProductController.getQuestions));
+router.post('/:id/questions', asyncHandler(ProductController.addQuestion));
 
 router.post('/', authenticate, authorizeRoles(UserRole.SELLER, UserRole.ADMIN), asyncHandler(ProductController.create));
 router.put('/:id', authenticate, authorizeRoles(UserRole.SELLER, UserRole.ADMIN), asyncHandler(ProductController.update));

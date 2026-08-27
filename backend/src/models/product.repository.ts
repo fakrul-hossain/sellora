@@ -16,11 +16,26 @@ export interface ProductRow extends RowDataPacket {
   discount_percentage: number;
   stock: number;
   image_url: string;
+  video_url?: string;
+  specifications_json?: string;
+  in_the_box?: string;
+  warranty?: string;
   features_json?: string;
   rating: number;
   review_count: number;
   is_published: number;
   is_approved: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface ProductQuestionRow extends RowDataPacket {
+  id: number;
+  product_id: number;
+  user_name: string;
+  question: string;
+  answer?: string;
+  answered_by?: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -33,6 +48,10 @@ export interface UpdateProductPayload {
   brand?: string;
   description?: string;
   image_url?: string;
+  video_url?: string;
+  specifications?: any;
+  in_the_box?: string;
+  warranty?: string;
   features?: string[];
 }
 
@@ -46,8 +65,11 @@ export class ProductRepository {
     return rows.length > 0 ? rows[0] : null;
   }
 
-  public static async findAll(query: { category?: string; search?: string; vendorId?: string }): Promise<ProductRow[]> {
+  public static async findAll(query: { category?: string; search?: string; vendorId?: string; includeUnapproved?: boolean }): Promise<ProductRow[]> {
     const whereConditions: string[] = ['is_published = 1'];
+    if (!query.includeUnapproved) {
+      whereConditions.push('is_approved = 1');
+    }
     const params: any[] = [];
 
     if (query.vendorId) {
@@ -91,19 +113,26 @@ export class ProductRepository {
     stock: number;
     sku?: string;
     imageUrl?: string;
+    videoUrl?: string;
+    specifications?: any;
+    inTheBox?: string;
+    warranty?: string;
     features?: string[];
+    isApproved?: boolean;
   }): Promise<ProductRow> {
     const numericVendorId = typeof product.vendorId === 'string' ? parseInt(product.vendorId, 10) : product.vendorId;
     const generatedSku = product.sku || `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const defaultImage = product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000';
+    const isApprovedVal = product.isApproved !== undefined ? (product.isApproved ? 1 : 0) : 0;
 
     const sql = `
       INSERT INTO products (
         vendor_id, category, brand, title, slug, sku, description,
         price, original_price, discount_percentage, stock, image_url,
+        video_url, specifications_json, in_the_box, warranty,
         features_json, rating, review_count, is_published, is_approved
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 4.80, 12, 1, 1)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 4.80, 12, 1, ?)
     `;
 
     const result = await mysqlClient.execute(sql, [
@@ -119,7 +148,12 @@ export class ProductRepository {
       product.discountPercentage || 0,
       product.stock,
       defaultImage,
+      product.videoUrl || null,
+      product.specifications ? JSON.stringify(product.specifications) : null,
+      product.inTheBox || null,
+      product.warranty || null,
       JSON.stringify(product.features || []),
+      isApprovedVal,
     ]);
 
     const created = await this.findById(result.insertId);
@@ -145,6 +179,10 @@ export class ProductRepository {
     if (input.brand !== undefined) { fields.push('brand = ?'); values.push(input.brand); }
     if (input.description !== undefined) { fields.push('description = ?'); values.push(input.description); }
     if (input.image_url !== undefined) { fields.push('image_url = ?'); values.push(input.image_url); }
+    if (input.video_url !== undefined) { fields.push('video_url = ?'); values.push(input.video_url); }
+    if (input.specifications !== undefined) { fields.push('specifications_json = ?'); values.push(JSON.stringify(input.specifications)); }
+    if (input.in_the_box !== undefined) { fields.push('in_the_box = ?'); values.push(input.in_the_box); }
+    if (input.warranty !== undefined) { fields.push('warranty = ?'); values.push(input.warranty); }
     if (input.features !== undefined) { fields.push('features_json = ?'); values.push(JSON.stringify(input.features)); }
 
     if (fields.length === 0) {
@@ -156,6 +194,34 @@ export class ProductRepository {
     await mysqlClient.execute(sql, values);
 
     return await this.findById(numericId);
+  }
+
+  public static async updateApprovalStatus(id: number | string, isApproved: boolean): Promise<ProductRow | null> {
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    const sql = `UPDATE products SET is_approved = ? WHERE id = ?`;
+    await mysqlClient.execute(sql, [isApproved ? 1 : 0, numericId]);
+    return await this.findById(numericId);
+  }
+
+  public static async getQuestionsByProductId(productId: number | string): Promise<ProductQuestionRow[]> {
+    const numericId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
+    const sql = `SELECT * FROM product_questions WHERE product_id = ? ORDER BY created_at DESC`;
+    return await mysqlClient.query<ProductQuestionRow[]>(sql, [numericId]);
+  }
+
+  public static async createQuestion(productId: number | string, userName: string, question: string): Promise<ProductQuestionRow> {
+    const numericId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
+    const sql = `INSERT INTO product_questions (product_id, user_name, question) VALUES (?, ?, ?)`;
+    const result = await mysqlClient.execute(sql, [numericId, userName, question]);
+    const rows = await mysqlClient.query<ProductQuestionRow[]>(`SELECT * FROM product_questions WHERE id = ?`, [result.insertId]);
+    return rows[0];
+  }
+
+  public static async answerQuestion(questionId: number | string, answer: string, answeredBy: string): Promise<boolean> {
+    const numericId = typeof questionId === 'string' ? parseInt(questionId, 10) : questionId;
+    const sql = `UPDATE product_questions SET answer = ?, answered_by = ? WHERE id = ?`;
+    const result = await mysqlClient.execute(sql, [answer, answeredBy, numericId]);
+    return result.affectedRows > 0;
   }
 
   public static async updateStock(productId: number | string, vendorId: number | string, newStock: number): Promise<boolean> {
