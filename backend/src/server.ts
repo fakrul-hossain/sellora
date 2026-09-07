@@ -5,6 +5,8 @@ import { mysqlClient } from './models/mysql.client.js';
 import { DatabaseSchema } from './models/schema.js';
 import { logger } from './utils/logger.js';
 
+export const app = createApp();
+
 async function bootstrapServer() {
   try {
     logger.info('Bootstrapping SELLORA Enterprise API Server...');
@@ -12,7 +14,6 @@ async function bootstrapServer() {
     await mysqlClient.connect();
     await DatabaseSchema.initializeSchema();
 
-    const app = createApp();
     const server = http.createServer(app);
 
     server.listen(env.PORT, () => {
@@ -56,4 +57,13 @@ async function bootstrapServer() {
   }
 }
 
-bootstrapServer();
+if (process.env.VERCEL !== '1' && !process.env.VERCEL_ENV) {
+  bootstrapServer();
+} else {
+  // Serverless Vercel environment: initialize database pool
+  mysqlClient.connect().then(() => DatabaseSchema.initializeSchema()).catch((err) => {
+    logger.error('Vercel MySQL connection error:', err);
+  });
+}
+
+export default app;
