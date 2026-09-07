@@ -282,7 +282,7 @@ export default function MyOrdersPage() {
                 className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden transition-all hover:border-slate-300"
               >
                 {/* Order Summary Header */}
-                <div className="p-5 sm:p-6 bg-slate-50/50 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="p-4 sm:p-6 bg-slate-50/50 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 text-brand-primary flex items-center justify-center shrink-0 shadow-2xs">
                       <Package className="w-5 h-5" />
@@ -372,10 +372,10 @@ export default function MyOrdersPage() {
 
                 {/* EXPANDABLE LOGISTICS TRACKER PANEL */}
                 {isExpanded && (
-                  <div className="border-t border-slate-200/90 bg-gradient-to-b from-slate-50/60 to-white p-5 sm:p-7 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="border-t border-slate-200/90 bg-gradient-to-b from-slate-50/60 to-white p-3.5 sm:p-7 space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
 
                     {/* Carrier & Tracking Code Bar */}
-                    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <Building2 className="w-4 h-4 text-brand-primary" />
@@ -406,8 +406,8 @@ export default function MyOrdersPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-6 text-xs">
-                        <div className="border-l lg:border-l border-slate-200 pl-4 space-y-0.5">
+                      <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 text-xs">
+                        <div className="border-l lg:border-l border-slate-200 pl-3.5 sm:pl-4 space-y-0.5">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                             <Calendar className="w-3 h-3 text-slate-400" />
                             <span>Estimated Delivery</span>
@@ -418,7 +418,7 @@ export default function MyOrdersPage() {
                         </div>
 
                         {ord.shippingAddress && (
-                          <div className="border-l border-slate-200 pl-4 space-y-0.5 max-w-[220px]">
+                          <div className="border-l border-slate-200 pl-3.5 sm:pl-4 space-y-0.5 max-w-[200px] sm:max-w-[220px]">
                             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                               <MapPin className="w-3 h-3 text-slate-400" />
                               <span>Destination</span>

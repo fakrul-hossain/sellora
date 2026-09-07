@@ -64,7 +64,7 @@ function RegisterContent() {
   };
 
   return (
-    <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl border border-slate-200 shadow-xl font-sans">
+    <div className="max-w-md w-full space-y-6 sm:space-y-8 bg-white p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl font-sans">
       {/* Header Info Banner */}
       <div className="text-center space-y-2">
         <div className="w-12 h-12 rounded-2xl bg-brand-primary text-white flex items-center justify-center mx-auto shadow-md">

@@ -50,15 +50,15 @@ export default function CartPage() {
                 {cartItems.map((item) => (
                   <div
                     key={item.product.id}
-                    className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4"
+                    className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                   >
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3.5 w-full sm:w-auto">
                       <img
                         src={item.product.imageUrl}
                         alt={item.product.title}
-                        className="w-16 h-16 object-contain bg-slate-50 rounded-xl p-2 border border-slate-100 shrink-0"
+                        className="w-14 h-14 sm:w-16 sm:h-16 object-contain bg-slate-50 rounded-xl p-1.5 border border-slate-100 shrink-0"
                       />
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <Link href={`/products/${item.product.id}`} className="text-xs font-bold text-slate-900 hover:text-brand-primary line-clamp-1">
                           {item.product.title}
                         </Link>
@@ -78,7 +78,7 @@ export default function CartPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-6 shrink-0">
+                    <div className="flex items-center justify-between w-full sm:w-auto sm:space-x-6 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                       {/* Quantity Selector */}
                       <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-white">
                         <button

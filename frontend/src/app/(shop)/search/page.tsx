@@ -60,7 +60,7 @@ function SearchContent() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
           {products.map((p) => (
             <SelloraProductCard key={p.id} product={p} />
           ))}

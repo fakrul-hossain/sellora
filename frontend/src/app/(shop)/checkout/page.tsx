@@ -249,14 +249,14 @@ export default function CheckoutPage() {
               </Link>
             </div>
           ) : (
-            <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
               {/* Delivery & Payment Columns */}
               <div className="lg:col-span-8 space-y-6">
                 {/* Delivery Address Form */}
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-2xs space-y-4">
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-slate-200/80 shadow-2xs space-y-4">
                   <h3 className="text-sm font-extrabold text-brand-dark border-b border-slate-100 pb-3 flex items-center justify-between">
                     <span>1. Shipping Details</span>
-                    <span className="text-xs font-semibold text-slate-400">Doorstep Delivery in Bangladesh</span>
+                    <span className="text-xs font-semibold text-slate-400">Doorstep Delivery</span>
                   </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -323,14 +323,14 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Payment Method Selector */}
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-2xs space-y-5">
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-slate-200/80 shadow-2xs space-y-5">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="text-sm font-extrabold text-brand-dark">
                       2. Payment Method
                     </h3>
                     <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>SSL 256-Bit Encrypted</span>
+                      <span>SSL 256-Bit</span>
                     </div>
                   </div>
 
@@ -345,8 +345,8 @@ export default function CheckoutPage() {
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
-                        <CreditCard className="w-5 h-5" />
+                      <div className="w-14 h-11 rounded-xl bg-white p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs">
+                        <img src="/images/stripe.png" alt="Stripe Cards" className="h-5 w-auto object-contain" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
@@ -366,8 +366,8 @@ export default function CheckoutPage() {
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
-                        <Banknote className="w-5 h-5" />
+                      <div className="w-14 h-11 rounded-xl bg-white p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs">
+                        <img src="/images/cod.avif" alt="Cash on Delivery" className="h-7 w-auto object-contain" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="font-extrabold text-slate-900 block text-sm">Cash on Delivery</span>
@@ -384,8 +384,8 @@ export default function CheckoutPage() {
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 font-black text-xs flex items-center justify-center shrink-0 border border-pink-100">
-                        bKash
+                      <div className="w-14 h-11 rounded-xl bg-white p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs">
+                        <img src="/images/bkash_logo.avif" alt="bKash" className="h-7 w-auto object-contain" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="font-extrabold text-slate-900 block text-sm">bKash Payment</span>
@@ -393,7 +393,7 @@ export default function CheckoutPage() {
                       </div>
                     </label>
 
-                    {/* Nagad Mobile Wallet */}
+                    {/* Upay / Nagad Mobile Wallet */}
                     <label
                       onClick={() => setPaymentMethod('nagad')}
                       className={`p-4 rounded-2xl border cursor-pointer flex items-start space-x-3.5 transition-all ${
@@ -402,11 +402,11 @@ export default function CheckoutPage() {
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 font-black text-xs flex items-center justify-center shrink-0 border border-orange-100">
-                        Nagad
+                      <div className="w-14 h-11 rounded-xl bg-white p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs">
+                        <img src="/images/upay2.svg" alt="Upay" className="h-7 w-auto object-contain" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="font-extrabold text-slate-900 block text-sm">Nagad Payment</span>
+                        <span className="font-extrabold text-slate-900 block text-sm">Upay / Nagad Payment</span>
                         <span className="text-[11px] text-slate-500 block mt-0.5">Fast 1-step gateway checkout</span>
                       </div>
                     </label>
@@ -420,8 +420,8 @@ export default function CheckoutPage() {
                       className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90 space-y-4"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                          <CreditCard className="w-4 h-4 text-brand-primary" />
+                        <span className="text-xs font-black text-slate-800 flex items-center gap-2">
+                          <img src="/images/stripe.png" alt="Stripe" className="h-4 w-auto object-contain" />
                           <span>Enter Card Details (Powered by Stripe)</span>
                         </span>
                         <span className="text-[10px] font-bold text-slate-400">Test Card Ready</span>
@@ -491,9 +491,11 @@ export default function CheckoutPage() {
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 text-xs text-emerald-800 flex items-center gap-3"
+                      className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 text-xs text-emerald-800 flex items-center gap-3.5"
                     >
-                      <Banknote className="w-6 h-6 text-emerald-600 shrink-0" />
+                      <div className="w-12 h-12 rounded-xl bg-white p-1 border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs">
+                        <img src="/images/cod.avif" alt="Cash on Delivery" className="h-8 w-auto object-contain" />
+                      </div>
                       <div>
                         <strong className="block font-bold">Pay in Cash at Doorstep</strong>
                         <span className="text-[11px] text-emerald-700">Please keep the exact amount of ৳{grandTotal.toLocaleString()} ready for the courier.</span>
@@ -505,7 +507,7 @@ export default function CheckoutPage() {
 
               {/* Order Summary Side Card */}
               <div className="lg:col-span-4">
-                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4 sticky top-24">
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-2xs space-y-4 lg:sticky top-24">
                   <h3 className="text-sm font-extrabold text-brand-dark pb-3 border-b border-slate-100 flex items-center justify-between">
                     <span>Order Summary</span>
                     <span className="text-xs text-slate-400 font-bold">({cartItems.length} items)</span>

@@ -201,7 +201,7 @@ export default function ProductDetailsPage() {
           </nav>
 
           {/* Main Hero Product Details Card - Balanced 2-Column Grid */}
-          <div className="bg-white rounded-3xl p-5 sm:p-8 lg:p-10 border border-slate-200/90 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-8 lg:p-10 border border-slate-200/90 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
 
             {/* LEFT COLUMN (lg:col-span-6) - Gallery, Brand Store & Key Features */}
             <div className="lg:col-span-6 space-y-6">

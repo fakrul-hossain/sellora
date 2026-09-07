@@ -44,7 +44,7 @@ export function CategoryCircularGrid() {
         </div>
 
         {/* Circular Grid Layout */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
+        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
           {categoriesList.map((cat) => (
             <Link
               key={cat.id}
@@ -52,7 +52,7 @@ export function CategoryCircularGrid() {
               className="group flex flex-col items-center text-center transition-all duration-300"
             >
               {/* Circular Image Stage */}
-              <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-slate-100 p-2 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105 group-hover:shadow-lg border border-slate-200">
+              <div className="relative w-18 h-18 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-slate-100 p-1.5 sm:p-2 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105 group-hover:shadow-lg border border-slate-200">
                 <img
                   src={cat.image}
                   alt={cat.name}
@@ -62,11 +62,11 @@ export function CategoryCircularGrid() {
               </div>
 
               {/* Title & Product Count */}
-              <div className="mt-3 space-y-1">
-                <h3 className="text-sm sm:text-base font-bold text-slate-800 group-hover:text-brand-primary transition-colors line-clamp-2">
+              <div className="mt-2 space-y-0.5">
+                <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-brand-primary transition-colors line-clamp-1">
                   {cat.name}
                 </h3>
-                <p className="text-xs text-slate-400 font-medium">
+                <p className="text-[10px] sm:text-xs text-slate-400 font-medium">
                   {cat.itemCount}
                 </p>
               </div>

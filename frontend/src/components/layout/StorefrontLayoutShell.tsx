@@ -2,15 +2,14 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { StorefrontHeader, StorefrontFooter } from '@/components/layout';
+import { StorefrontHeader, StorefrontFooter, MobileBottomBar } from '@/components/layout';
 
 export function StorefrontLayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Exclude Storefront Header and Footer from Admin, Customer Dashboard, and Seller Portals
+  // Exclude Storefront Header and Footer from Admin and Seller Portals
   const isDashboardRoute =
     pathname.startsWith('/admin') ||
-    // pathname.startsWith('/dashboard') ||
     pathname.startsWith('/seller');
 
   if (isDashboardRoute) {
@@ -20,8 +19,9 @@ export function StorefrontLayoutShell({ children }: { children: React.ReactNode 
   return (
     <>
       <StorefrontHeader />
-      <main className="flex-1 flex flex-col">{children}</main>
+      <main className="flex-1 flex flex-col pb-14 md:pb-0">{children}</main>
       <StorefrontFooter />
+      <MobileBottomBar />
     </>
   );
 }

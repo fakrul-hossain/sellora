@@ -97,7 +97,7 @@ export function FlashSaleCarousel({ products }: { products?: any[] } = {}) {
         </div>
 
         {/* Flash Sale Product Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
           {flashProducts.map((prod) => (
             <div key={prod.id} className="space-y-2">
               <SelloraProductCard product={prod} />

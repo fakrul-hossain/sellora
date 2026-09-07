@@ -42,16 +42,16 @@ export default function CategoriesBrowsePage() {
           </div>
 
           {/* Categories Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-4">
             {categoriesList.map((c) => (
               <Link
                 key={c.name}
                 href={`/search?q=${encodeURIComponent(c.name)}`}
-                className="p-5 rounded-2xl bg-white border border-slate-200/80 hover:border-brand-primary shadow-2xs hover:shadow-md transition-all cursor-pointer group block"
+                className="p-3.5 sm:p-5 rounded-2xl bg-white border border-slate-200/80 hover:border-brand-primary shadow-2xs hover:shadow-md transition-all cursor-pointer group block"
               >
-                <span className="text-3xl block mb-2">{c.icon}</span>
+                <span className="text-2xl sm:text-3xl block mb-1.5 sm:mb-2">{c.icon}</span>
                 <h3 className="text-xs font-bold text-slate-900 group-hover:text-brand-primary transition-colors">{c.name}</h3>
-                <span className="text-[10px] text-slate-400 font-semibold block mt-1">{c.count}</span>
+                <span className="text-[10px] text-slate-400 font-semibold block mt-0.5 sm:mt-1">{c.count}</span>
               </Link>
             ))}
           </div>
@@ -59,7 +59,7 @@ export default function CategoriesBrowsePage() {
           {/* Featured Department Items */}
           <div className="space-y-4 pt-4">
             <h2 className="text-base font-extrabold text-brand-dark">Live Catalog Products</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
               {displayProducts.map((p) => (
                 <SelloraProductCard key={p.id} product={p} />
               ))}

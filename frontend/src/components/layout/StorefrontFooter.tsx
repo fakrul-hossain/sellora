@@ -7,7 +7,7 @@ import { PhoneCall, Mail, MapPin, Lock } from 'lucide-react';
 export function StorefrontFooter() {
   return (
     <footer className="bg-brand-dark text-brand-lightest font-sans text-xs border-t border-brand-dark/20">
-      <div className="max-w-[1536px] mx-auto px-4 sm:px-6 py-12 lg:py-16 space-y-12">
+      <div className="max-w-[1536px] mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-16 space-y-8 sm:space-y-12">
         {/* Main 4 Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
           
@@ -73,12 +73,19 @@ export function StorefrontFooter() {
               We accept Cash on Delivery nationwide along with bKash, Nagad, Visa, Mastercard, and Amex credit cards.
             </p>
 
-            <div className="flex flex-wrap gap-2 text-[10px] font-black">
-              <span className="px-2.5 py-1 rounded-lg bg-brand-primary text-white">bKash</span>
-              <span className="px-2.5 py-1 rounded-lg bg-orange-600 text-white">Nagad</span>
-              <span className="px-2.5 py-1 rounded-lg bg-blue-600 text-white">Visa</span>
-              <span className="px-2.5 py-1 rounded-lg bg-brand-primary text-white">Mastercard</span>
-              <span className="px-2.5 py-1 rounded-lg bg-brand-dark/90 text-white border border-brand-light/30">Cash on Delivery</span>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <div className="bg-white px-2.5 py-1 rounded-xl flex items-center justify-center shadow-xs border border-white/20 h-9" title="Stripe Cards (Visa, Mastercard, Amex)">
+                <img src="/images/stripe.png" alt="Stripe / Cards" className="h-4 sm:h-5 w-auto object-contain" />
+              </div>
+              <div className="bg-white px-2.5 py-1 rounded-xl flex items-center justify-center shadow-xs border border-white/20 h-9" title="bKash">
+                <img src="/images/bkash_logo.avif" alt="bKash" className="h-6 w-auto object-contain" />
+              </div>
+              <div className="bg-white px-2.5 py-1 rounded-xl flex items-center justify-center shadow-xs border border-white/20 h-9" title="Cash on Delivery">
+                <img src="/images/cod.avif" alt="Cash on Delivery" className="h-6 w-auto object-contain" />
+              </div>
+              <div className="bg-white px-2.5 py-1 rounded-xl flex items-center justify-center shadow-xs border border-white/20 h-9" title="Upay / Digital Wallet">
+                <img src="/images/upay2.svg" alt="Upay" className="h-6 w-auto object-contain" />
+              </div>
             </div>
 
             <div className="p-3 rounded-2xl bg-brand-dark/60 border border-brand-light/20 flex items-center gap-2.5 text-[11px] text-brand-light font-bold">

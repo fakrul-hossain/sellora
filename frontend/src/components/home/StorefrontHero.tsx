@@ -42,7 +42,7 @@ export function StorefrontHero() {
       <div className="max-w-[1536px] mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
         
         {/* Left Main Slider — Pure 100% Un-obscured Image Banner */}
-        <div className="lg:col-span-9 relative rounded-2xl overflow-hidden shadow-sm bg-stone-100 min-h-[300px] sm:min-h-[360px] lg:min-h-[400px] flex items-center group">
+        <div className="lg:col-span-9 relative rounded-2xl overflow-hidden shadow-sm bg-stone-100 min-h-[190px] sm:min-h-[280px] lg:min-h-[400px] aspect-[16/9] sm:aspect-[21/9] lg:aspect-auto flex items-center group">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -65,29 +65,29 @@ export function StorefrontHero() {
           {/* Left Arrow Button */}
           <button
             onClick={prevSlide}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
+            className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
             aria-label="Previous Slide"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Right Arrow Button */}
           <button
             onClick={nextSlide}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
+            className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10"
             aria-label="Next Slide"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Bottom Pagination Dots */}
-          <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-1.5 z-10">
+          <div className="absolute bottom-2.5 sm:bottom-3 inset-x-0 flex items-center justify-center gap-1.5 z-10">
             {heroSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
-                  currentSlide === idx ? 'w-6 bg-brand-primary' : 'w-2 bg-white/80 hover:bg-white'
+                className={`h-1.5 sm:h-2 rounded-full transition-all cursor-pointer ${
+                  currentSlide === idx ? 'w-5 sm:w-6 bg-brand-primary' : 'w-1.5 sm:w-2 bg-white/80 hover:bg-white'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
@@ -95,8 +95,8 @@ export function StorefrontHero() {
           </div>
         </div>
 
-        {/* Right App Download Promo Card */}
-        <div className="lg:col-span-3 rounded-2xl overflow-hidden bg-gradient-to-b from-brand-lightest via-brand-light/30 to-brand-primary/20 p-5 flex flex-col justify-between shadow-xs border border-brand-light/40 relative">
+        {/* Right App Download Promo Card (Desktop Only to prevent mobile vertical clutter) */}
+        <div className="hidden lg:flex lg:col-span-3 rounded-2xl overflow-hidden bg-gradient-to-b from-brand-lightest via-brand-light/30 to-brand-primary/20 p-5 flex-col justify-between shadow-xs border border-brand-light/40 relative">
           <div className="space-y-3">
             <div className="bg-brand-dark text-white p-4 rounded-2xl shadow-md text-center relative overflow-hidden">
               <p className="text-xs font-bold text-brand-lightest uppercase tracking-wider">Download the App &</p>

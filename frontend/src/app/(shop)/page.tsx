@@ -148,7 +148,7 @@ export default function RedesignedStorefrontPage() {
             </div>
 
             {/* Product Cards Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-4">
               {activeProducts.map((prod) => (
                 <SelloraProductCard key={prod.id} product={prod} />
               ))}
@@ -162,12 +162,6 @@ export default function RedesignedStorefrontPage() {
         {/* 8. Luxury Tech Newsletter Subscription */}
         <LuxuryNewsletterCard />
       </main>
-
-      {/* Mobile Bottom Navigation Bar */}
-      <MobileBottomBar />
-
-      {/* Rich 4-Column Footer */}
-
     </div>
   );
 }
