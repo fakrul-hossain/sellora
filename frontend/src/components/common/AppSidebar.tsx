@@ -62,9 +62,9 @@ export function AppSidebar({
   const hoverClass = isSlateTheme ? 'text-slate-300 hover:bg-slate-800' : 'text-brand-lightest/80 hover:bg-white/10 hover:text-white';
 
   const renderContent = () => (
-    <div className="flex flex-col justify-between h-full p-6 space-y-6">
-      <div className="space-y-6 overflow-y-auto scrollbar-none">
-        {/* Brand Header */}
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* 1. Fixed Brand Header */}
+      <div className={`p-5 pb-4 border-b ${borderClass} shrink-0`}>
         <Link href={brand.href || '/'} className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-2xl bg-brand-primary flex items-center justify-center text-white font-black shadow-md shrink-0 group-hover:scale-105 transition-transform">
             <BrandIcon className="w-5 h-5" />
@@ -76,8 +76,10 @@ export function AppSidebar({
             </span>
           </div>
         </Link>
+      </div>
 
-        {/* Dynamic Navigation Menu */}
+      {/* 2. Scrollable Middle Navigation Menu with Specific Sidebar Scrollbar */}
+      <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-1.5 sidebar-scrollbar">
         <nav className="space-y-1.5 text-xs font-bold">
           {menuItems.map((item) => {
             const ItemIcon = item.icon;
@@ -89,30 +91,32 @@ export function AppSidebar({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all ${isActive ? activeClass : hoverClass
-                  }`}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all ${
+                  isActive ? activeClass : hoverClass
+                }`}
               >
-                <ItemIcon className={`w-4 h-4 ${isActive ? 'text-white' : isSlateTheme ? 'text-slate-400' : 'text-brand-light'}`} />
-                <span>{item.label}</span>
+                <ItemIcon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : isSlateTheme ? 'text-slate-400' : 'text-brand-light'}`} />
+                <span className="truncate">{item.label}</span>
               </Link>
             );
           })}
         </nav>
       </div>
 
-      {/* Footer & User Actions */}
-      <div className={`space-y-2 pt-4 border-t ${borderClass} shrink-0`}>
+      {/* 3. Fixed Footer & User Actions */}
+      <div className={`p-3.5 border-t ${borderClass} shrink-0 space-y-1.5 bg-black/15`}>
         {footerLinks.map((link) => {
           const LinkIcon = link.icon;
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${isSlateTheme ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-brand-lightest/70 hover:text-white hover:bg-white/10'
-                }`}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-bold transition-all ${
+                isSlateTheme ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-brand-lightest/70 hover:text-white hover:bg-white/10'
+              }`}
             >
-              <LinkIcon className="w-4 h-4" />
-              <span>{link.label}</span>
+              <LinkIcon className="w-4 h-4 shrink-0" />
+              <span className="truncate">{link.label}</span>
             </Link>
           );
         })}
@@ -120,9 +124,9 @@ export function AppSidebar({
         {onLogout && (
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-rose-400 hover:bg-rose-950/40 transition-all text-xs font-bold cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-rose-400 hover:bg-rose-950/40 transition-all text-xs font-bold cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 shrink-0" />
             <span>{logoutText}</span>
           </button>
         )}
@@ -155,7 +159,7 @@ export function AppSidebar({
         </button>
       </div>
 
-      {/* Mobile Slide-Over Drawer Drawer Overlay */}
+      {/* Mobile Slide-Over Drawer Overlay */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -171,7 +175,7 @@ export function AppSidebar({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`fixed top-0 left-0 bottom-0 w-72 ${sidebarBgClass} z-50 lg:hidden shadow-2xl flex flex-col`}
+              className={`fixed top-0 left-0 bottom-0 w-72 ${sidebarBgClass} z-50 lg:hidden shadow-2xl flex flex-col h-full overflow-hidden`}
             >
               {renderContent()}
             </motion.aside>
@@ -179,8 +183,10 @@ export function AppSidebar({
         )}
       </AnimatePresence>
 
-      {/* Desktop Sticky Sidebar */}
-      <aside className={`hidden lg:flex w-64 ${sidebarBgClass} flex-col border-r ${borderClass} shrink-0 sticky top-0 h-screen z-30`}>
+      {/* Desktop Fixed Left Sidebar */}
+      <aside
+        className={`hidden lg:flex lg:fixed lg:top-0 lg:bottom-0 lg:left-0 lg:w-64 ${sidebarBgClass} flex-col border-r ${borderClass} z-40 h-screen overflow-hidden`}
+      >
         {renderContent()}
       </aside>
     </>

@@ -46,8 +46,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminGuard>
-      <div className="flex flex-col lg:flex-row min-h-screen bg-[#FAFAFA] font-sans text-slate-800 antialiased">
-        {/* Dynamic Mobile-Responsive Reusable AppSidebar */}
+      <div className="min-h-screen bg-[#FAFAFA] font-sans text-slate-800 antialiased">
+        {/* Dynamic Mobile-Responsive Reusable AppSidebar (Fixed on Desktop) */}
         <AppSidebar
           brand={{
             title: 'SELLORA',
@@ -66,8 +66,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           theme="dark"
         />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0">
+        {/* Main Content Area (Offset by 64 / 256px on desktop) */}
+        <div className="lg:pl-64 flex flex-col min-h-screen min-w-0">
           {/* Top Command Bar */}
           <header className="h-16 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs">
             <div className="flex items-center gap-3 flex-1 max-w-md">

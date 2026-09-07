@@ -43,8 +43,8 @@ export default function SellerPortalLayout({ children }: { children: React.React
 
   return (
     <VendorGuard>
-      <div className="min-h-screen bg-[#FAFAFA] font-sans flex flex-col lg:flex-row antialiased">
-        {/* Dynamic Mobile-Responsive Reusable AppSidebar for Seller Hub */}
+      <div className="min-h-screen bg-[#FAFAFA] font-sans antialiased">
+        {/* Dynamic Mobile-Responsive Reusable AppSidebar for Seller Hub (Fixed on Desktop) */}
         <AppSidebar
           brand={{
             title: 'Seller Hub',
@@ -63,8 +63,10 @@ export default function SellerPortalLayout({ children }: { children: React.React
           theme="slate"
         />
 
-        {/* Seller Content Body */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">{children}</main>
+        {/* Seller Content Body (Offset by 64 / 256px on desktop for fixed left sidebar) */}
+        <div className="lg:pl-64 flex flex-col min-h-screen min-w-0">
+          <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">{children}</main>
+        </div>
       </div>
     </VendorGuard>
   );

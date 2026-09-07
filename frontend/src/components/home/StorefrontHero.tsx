@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Apple, Play } from 'lucide-react';
 import Link from 'next/link';
 import { useSiteSettings } from '@/hooks/use-site-settings';
+import Image from 'next/image';
 
 const DEFAULT_HERO_SLIDES = [
   {
@@ -40,7 +41,7 @@ export function StorefrontHero() {
   return (
     <section className="py-4 font-sans">
       <div className="max-w-[1536px] mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
-        
+
         {/* Left Main Slider — Pure 100% Un-obscured Image Banner */}
         <div className="lg:col-span-9 relative rounded-2xl overflow-hidden shadow-sm bg-stone-100 min-h-[190px] sm:min-h-[280px] lg:min-h-[400px] aspect-[16/9] sm:aspect-[21/9] lg:aspect-auto flex items-center group">
           <AnimatePresence mode="wait">
@@ -86,81 +87,25 @@ export function StorefrontHero() {
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-1.5 sm:h-2 rounded-full transition-all cursor-pointer ${
-                  currentSlide === idx ? 'w-5 sm:w-6 bg-brand-primary' : 'w-1.5 sm:w-2 bg-white/80 hover:bg-white'
-                }`}
+                className={`h-1.5 sm:h-2 rounded-full transition-all cursor-pointer ${currentSlide === idx ? 'w-5 sm:w-6 bg-brand-primary' : 'w-1.5 sm:w-2 bg-white/80 hover:bg-white'
+                  }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
           </div>
         </div>
 
-        {/* Right App Download Promo Card (Desktop Only to prevent mobile vertical clutter) */}
-        <div className="hidden lg:flex lg:col-span-3 rounded-2xl overflow-hidden bg-gradient-to-b from-brand-lightest via-brand-light/30 to-brand-primary/20 p-5 flex-col justify-between shadow-xs border border-brand-light/40 relative">
-          <div className="space-y-3">
-            <div className="bg-brand-dark text-white p-4 rounded-2xl shadow-md text-center relative overflow-hidden">
-              <p className="text-xs font-bold text-brand-lightest uppercase tracking-wider">Download the App &</p>
-              <h3 className="text-xl sm:text-2xl font-black leading-tight text-white mt-0.5">
-                GET ৳250 OFF
-              </h3>
-              <p className="text-[11px] font-medium text-brand-lightest mt-0.5">on your first order!</p>
-            </div>
-          </div>
 
-          <div className="bg-white/90 backdrop-blur-xs rounded-2xl p-4 border border-white shadow-xs space-y-3 mt-4 text-center">
-            <div className="flex items-center gap-3 justify-center">
-              <div className="w-16 h-16 bg-white p-1 rounded-lg border border-slate-200 shadow-xs shrink-0 flex items-center justify-center">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-brand-dark fill-current">
-                  <rect x="0" y="0" width="30" height="30" rx="3" />
-                  <rect x="5" y="5" width="20" height="20" fill="white" />
-                  <rect x="10" y="10" width="10" height="10" />
-                  <rect x="70" y="0" width="30" height="30" rx="3" />
-                  <rect x="75" y="5" width="20" height="20" fill="white" />
-                  <rect x="80" y="10" width="10" height="10" />
-                  <rect x="0" y="70" width="30" height="30" rx="3" />
-                  <rect x="5" y="75" width="20" height="20" fill="white" />
-                  <rect x="10" y="80" width="10" height="10" />
-                  <rect x="40" y="10" width="15" height="15" />
-                  <rect x="40" y="40" width="20" height="20" />
-                  <rect x="70" y="40" width="15" height="15" />
-                  <rect x="10" y="45" width="15" height="15" />
-                  <rect x="40" y="70" width="20" height="20" />
-                  <rect x="70" y="70" width="20" height="20" />
-                </svg>
-              </div>
-
-              <div className="text-left space-y-1">
-                <p className="text-xs font-extrabold text-brand-dark leading-tight">
-                  Scan QR code & get it now!
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 pt-1">
-              <Link
-                href="#"
-                className="flex-1 bg-brand-dark hover:bg-brand-dark-hover text-white rounded-lg p-2 flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Apple className="w-4 h-4 fill-white" />
-                <div className="text-left leading-none">
-                  <span className="text-[8px] block text-brand-lightest/80 font-medium">Available on</span>
-                  <span className="text-[10px] font-extrabold block">App Store</span>
-                </div>
-              </Link>
-
-              <Link
-                href="#"
-                className="flex-1 bg-brand-dark hover:bg-brand-dark-hover text-white rounded-lg p-2 flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Play className="w-3.5 h-3.5 fill-white stroke-none" />
-                <div className="text-left leading-none">
-                  <span className="text-[8px] block text-brand-lightest/80 font-medium">GET IT ON</span>
-                  <span className="text-[10px] font-extrabold block">Google Play</span>
-                </div>
-              </Link>
-            </div>
-          </div>
-
+        {/* Right App Download Promo Card (Desktop Only) */}
+        <div className="hidden lg:flex lg:col-span-3 rounded-2xl overflow-hidden shadow-xs border border-brand-light/40 relative w-full min-h-[420px]">
+          <Image
+            src="https://i.ibb.co.com/39q4C3MH/desktopsidebar.avif"
+            alt="Download App Promo"
+            fill
+            sizes="(min-width: 1024px) 25vw, 100vw"
+            className="object-cover"
+            priority
+          />
         </div>
 
       </div>

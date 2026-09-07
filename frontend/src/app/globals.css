@@ -48,6 +48,29 @@ img, svg, video, canvas, audio, iframe, embed, object {
   scrollbar-width: none;
 }
 
+/* Specific Modern Scrollbar for AppSidebar Navigation */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
 /* Brand Utility Classes */
 .bg-brand-lightest {
   background-color: var(--brand-lightest);
