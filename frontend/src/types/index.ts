@@ -4,7 +4,7 @@ export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | '
 
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
-export type PaymentMethod = 'CASH_ON_DELIVERY' | 'SSL_COMMERZ' | 'BKASH' | 'NAGAD' | 'STRIPE';
+export type PaymentMethod = 'CASH_ON_DELIVERY' | 'SSL_COMMERZ' | 'BKASH' | 'NAGAD' | 'STRIPE' | 'STRIPE_CARD';
 
 export interface UserAddress {
   id?: string;

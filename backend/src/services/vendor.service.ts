@@ -119,6 +119,13 @@ export class VendorService {
   }
 
   public static async createProduct(vendorId: string, input: any) {
+    if (input.sku && input.sku.trim()) {
+      const existingSku = await ProductRepository.findBySku(input.sku.trim());
+      if (existingSku) {
+        throw AppError.conflict(`Product SKU "${input.sku.trim()}" is already in use by another listing. Please provide a unique SKU.`);
+      }
+    }
+
     const slug = input.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -135,12 +142,18 @@ export class VendorService {
       discountPercentage: input.discountPercentage ? Number(input.discountPercentage) : 0,
       stock: Number(input.stock || 0),
       sku: input.sku || `SKU-${Date.now()}`,
-      imageUrl: input.imageUrl,
+      imageUrl: input.imageUrl || (input.images && input.images[0]),
+      images: input.images || (input.imageUrl ? [input.imageUrl] : []),
       description: input.description || '',
+      videoUrl: input.videoUrl,
+      specifications: input.specifications,
+      inTheBox: input.inTheBox,
+      warranty: input.warranty,
       features: input.features || [],
+      isApproved: false,
     });
 
-    return created;
+    return ProductService.formatProduct(created, input.images);
   }
 
   public static async updateProduct(productId: string, vendorId: string, input: any) {

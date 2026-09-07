@@ -5,15 +5,28 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/providers/cart-context';
+import { useAuth } from '@/providers/auth-context';
+import { useToast } from '@/components/ui/toast';
 
 export const dynamic = 'force-dynamic';
 
 export default function CartPage() {
   const router = useRouter();
   const { cartItems, updateQuantity, removeFromCart, subtotal, totalItemsCount } = useCart();
+  const { user } = useAuth();
+  const toast = useToast();
 
   const shippingFee = cartItems.length > 0 ? 60 : 0;
   const grandTotal = subtotal + shippingFee;
+
+  const handleProceedToCheckout = () => {
+    if (!user) {
+      toast.info('Please log in to proceed to checkout.', 'Login Required');
+      router.push('/login?redirect=/checkout');
+      return;
+    }
+    router.push('/checkout');
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex flex-col justify-between font-sans text-slate-800">
@@ -120,7 +133,7 @@ export default function CartPage() {
                   </div>
 
                   <button
-                    onClick={() => router.push('/checkout')}
+                    onClick={handleProceedToCheckout}
                     className="w-full py-3.5 rounded-full bg-brand-primary text-white font-extrabold text-xs hover:bg-brand-primary-hover transition-colors shadow-sm flex items-center justify-center space-x-2 cursor-pointer"
                   >
                     <span>Proceed to Checkout</span>

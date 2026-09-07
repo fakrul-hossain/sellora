@@ -42,10 +42,16 @@ export class ApiClient {
         this.clearToken();
       }
 
-      const result = await response.json();
+      let result: any = null;
+      try {
+        result = await response.json();
+      } catch {
+        result = null;
+      }
 
       if (!response.ok) {
-        throw new Error(result.message || 'API request failed');
+        const errMsg = result?.message || result?.error || (typeof result === 'string' ? result : `Server error (${response.status})`);
+        throw new Error(errMsg);
       }
 
       return result.data as T;

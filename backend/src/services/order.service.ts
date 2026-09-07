@@ -93,6 +93,7 @@ export class OrderService {
         connection
       );
 
+      // Step 3: Insert each purchased item into order_items table
       for (const item of input.items) {
         await OrderRepository.createOrderItem(
           {
@@ -109,7 +110,15 @@ export class OrderService {
         );
       }
 
+      // Step 4: Record initial order status history
       await OrderRepository.addStatusHistory(newOrderId, OrderStatus.PENDING, 'Order placed by customer', connection);
+
+      // Step 5: Record transaction in payments table (Report Requirement)
+      await connection.execute(
+        `INSERT INTO payments (order_id, amount, payment_method, payment_status, transaction_id)
+         VALUES (?, ?, ?, ?, ?)`,
+        [newOrderId, totalAmount, input.paymentMethod, paymentStatus, `TRX-${Date.now()}`]
+      );
 
       return newOrderId;
     });

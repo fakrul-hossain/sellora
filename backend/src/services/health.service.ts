@@ -1,26 +1,34 @@
-import { mysqlClient } from '../models/mysql.client.js';
-import { metricsCollector } from '../utils/metrics.js';
+import { pool } from '../models/mysql.client.js';
 
 export interface SystemHealthStatus {
   status: 'UP' | 'DOWN' | 'DEGRADED';
   database: 'CONNECTED' | 'DISCONNECTED';
   uptimeSeconds: number;
   memory: NodeJS.MemoryUsage;
-  metrics: ReturnType<typeof metricsCollector.getSummary>;
   timestamp: string;
 }
 
+/**
+ * Basic health check service
+ * Checks database connectivity and server uptime.
+ */
 export class HealthService {
   public async getHealth(): Promise<SystemHealthStatus> {
-    const isDbHealthy = await mysqlClient.isHealthy();
-    const metricsSummary = metricsCollector.getSummary();
+    let isDbConnected = false;
+    try {
+      const conn = await pool.getConnection();
+      await conn.ping();
+      conn.release();
+      isDbConnected = true;
+    } catch {
+      isDbConnected = false;
+    }
 
     return {
-      status: isDbHealthy ? 'UP' : 'DEGRADED',
-      database: isDbHealthy ? 'CONNECTED' : 'DISCONNECTED',
-      uptimeSeconds: metricsSummary.uptimeSeconds,
+      status: isDbConnected ? 'UP' : 'DEGRADED',
+      database: isDbConnected ? 'CONNECTED' : 'DISCONNECTED',
+      uptimeSeconds: Math.floor(process.uptime()),
       memory: process.memoryUsage(),
-      metrics: metricsSummary,
       timestamp: new Date().toISOString(),
     };
   }

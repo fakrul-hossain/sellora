@@ -11,11 +11,13 @@ interface ProductGalleryProps {
 }
 
 export function ProductGallery({ product, selectedColorImage }: ProductGalleryProps) {
+  const rawList = (product.galleryImages && product.galleryImages.length > 0)
+    ? product.galleryImages.filter(Boolean)
+    : (product.imageUrl ? [product.imageUrl] : []);
+
   const allImages = selectedColorImage
-    ? [selectedColorImage, ...product.galleryImages.filter((img) => img !== selectedColorImage)]
-    : product.galleryImages.length > 0
-      ? product.galleryImages
-      : [product.imageUrl];
+    ? [selectedColorImage, ...rawList.filter((img) => img !== selectedColorImage)]
+    : rawList;
 
   const [activeMedia, setActiveMedia] = useState<'image' | '360' | 'video'>('image');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -29,7 +31,7 @@ export function ProductGallery({ product, selectedColorImage }: ProductGalleryPr
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
-  const activeImage = allImages[currentImageIndex] || product.imageUrl;
+  const activeImage = allImages[currentImageIndex] || product.imageUrl || '';
   const frames = product.threeSixtyFrames && product.threeSixtyFrames.length > 0
     ? product.threeSixtyFrames
     : allImages;
@@ -75,53 +77,55 @@ export function ProductGallery({ product, selectedColorImage }: ProductGalleryPr
   return (
     <div className="flex flex-col xl:flex-row gap-4 w-full relative">
       {/* Thumbnails Strip - Desktop Left Vertical, Mobile Bottom Horizontal */}
-      <div className="order-2 xl:order-1 flex xl:flex-col gap-3 overflow-x-auto xl:overflow-y-auto max-h-[520px] scrollbar-none py-1 px-1">
-        {allImages.map((img, idx) => (
-          <button
-            key={idx}
-            onClick={() => {
-              setActiveMedia('image');
-              setCurrentImageIndex(idx);
-            }}
-            className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 overflow-hidden bg-slate-50 transition-all cursor-pointer p-1.5 ${activeMedia === 'image' && currentImageIndex === idx
-              ? 'border-brand-primary ring-4 ring-brand-primary/15 scale-95 shadow-md'
-              : 'border-slate-200/80 hover:border-slate-300 hover:scale-100 opacity-80 hover:opacity-100'
-              }`}
-          >
-            <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-contain" />
-          </button>
-        ))}
+      {(allImages.length > 1 || Boolean(product.threeSixtyFrames && product.threeSixtyFrames.length > 0) || Boolean(product.videoUrl && product.videoUrl.trim())) && (
+        <div className="order-2 xl:order-1 flex xl:flex-col gap-3 overflow-x-auto xl:overflow-y-auto max-h-[520px] scrollbar-none py-1 px-1">
+          {allImages.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                setActiveMedia('image');
+                setCurrentImageIndex(idx);
+              }}
+              className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 overflow-hidden bg-slate-50 transition-all cursor-pointer p-1.5 ${activeMedia === 'image' && currentImageIndex === idx
+                ? 'border-brand-primary ring-4 ring-brand-primary/15 scale-95 shadow-md'
+                : 'border-slate-200/80 hover:border-slate-300 hover:scale-100 opacity-80 hover:opacity-100'
+                }`}
+            >
+              <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-contain" />
+            </button>
+          ))}
 
-        {/* 360 Frame Toggle Thumbnail */}
-        {product.threeSixtyFrames && (
-          <button
-            onClick={() => setActiveMedia('360')}
-            className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 flex flex-col items-center justify-center transition-all cursor-pointer ${activeMedia === '360'
-              ? 'border-indigo-600 ring-4 ring-indigo-600/15 scale-95 shadow-md'
-              : 'border-slate-200 hover:border-indigo-300'
-              }`}
-          >
-            <RefreshCw className="w-5 h-5 text-indigo-600 animate-spin-slow" />
-            <span className="text-[10px] font-black text-indigo-700 mt-1 uppercase tracking-tighter">360° View</span>
-          </button>
-        )}
+          {/* 360 Frame Toggle Thumbnail */}
+          {product.threeSixtyFrames && product.threeSixtyFrames.length > 0 && (
+            <button
+              onClick={() => setActiveMedia('360')}
+              className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 flex flex-col items-center justify-center transition-all cursor-pointer ${activeMedia === '360'
+                ? 'border-indigo-600 ring-4 ring-indigo-600/15 scale-95 shadow-md'
+                : 'border-slate-200 hover:border-indigo-300'
+                }`}
+            >
+              <RefreshCw className="w-5 h-5 text-indigo-600 animate-spin-slow" />
+              <span className="text-[10px] font-black text-indigo-700 mt-1 uppercase tracking-tighter">360° View</span>
+            </button>
+          )}
 
-        {/* Video Mode Thumbnail */}
-        {product.videoUrl && (
-          <button
-            onClick={() => setActiveMedia('video')}
-            className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 overflow-hidden bg-brand-lightest flex flex-col items-center justify-center transition-all cursor-pointer ${activeMedia === 'video'
-              ? 'border-brand-primary ring-4 ring-brand-primary/15 scale-95 shadow-md'
-              : 'border-slate-200 hover:border-brand-light'
-              }`}
-          >
-            <div className="w-7 h-7 rounded-full bg-brand-primary flex items-center justify-center text-white shadow-sm">
-              <Play className="w-4 h-4 fill-white ml-0.5" />
-            </div>
-            <span className="text-[10px] font-black text-brand-primary mt-1 uppercase tracking-tighter">Video</span>
-          </button>
-        )}
-      </div>
+          {/* Video Mode Thumbnail */}
+          {product.videoUrl && product.videoUrl.trim() && (
+            <button
+              onClick={() => setActiveMedia('video')}
+              className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 overflow-hidden bg-brand-lightest flex flex-col items-center justify-center transition-all cursor-pointer ${activeMedia === 'video'
+                ? 'border-brand-primary ring-4 ring-brand-primary/15 scale-95 shadow-md'
+                : 'border-slate-200 hover:border-brand-light'
+                }`}
+            >
+              <div className="w-7 h-7 rounded-full bg-brand-primary flex items-center justify-center text-white shadow-sm">
+                <Play className="w-4 h-4 fill-white ml-0.5" />
+              </div>
+              <span className="text-[10px] font-black text-brand-primary mt-1 uppercase tracking-tighter">Video</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Main Showcase Stage */}
       <div className="order-1 xl:order-2 flex-1 relative rounded-3xl bg-gradient-to-b from-slate-50 to-white border border-slate-200/80 p-4 sm:p-8 flex items-center justify-center shadow-xs min-h-[380px] sm:min-h-[480px]">

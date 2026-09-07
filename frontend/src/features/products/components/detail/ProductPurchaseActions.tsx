@@ -6,6 +6,8 @@ import { ShoppingCart, Check, Heart, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ProductDetailItem } from '@/lib/products-data';
 import { useCart } from '@/providers/cart-context';
+import { useAuth } from '@/providers/auth-context';
+import { useToast } from '@/components/ui/toast';
 
 interface ProductPurchaseActionsProps {
   product: ProductDetailItem;
@@ -20,6 +22,8 @@ export function ProductPurchaseActions({
 }: ProductPurchaseActionsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const toast = useToast();
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -31,6 +35,13 @@ export function ProductPurchaseActions({
   };
 
   const handleBuyNow = () => {
+    // Check if customer is logged in before allowing purchase
+    if (!user) {
+      toast.info('Please log in to proceed with your purchase.', 'Login Required');
+      addToCart(product, quantity, selectedColorName, selectedVersionName);
+      router.push('/login?redirect=/checkout');
+      return;
+    }
     addToCart(product, quantity, selectedColorName, selectedVersionName);
     router.push('/checkout');
   };

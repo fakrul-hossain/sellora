@@ -1,13 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Heart, ShoppingBag } from 'lucide-react';
+import { ApiClient } from '@/lib/api-client';
 import { mockProducts } from '@/lib/products-data';
 import { SelloraProductCard } from '@/components/common/SelloraProductCard';
 
 export default function WishlistPage() {
-  const wishlistProducts = mockProducts.slice(0, 4);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    ApiClient.get<any[]>('/products')
+      .then((data) => {
+        if (data && data.length > 0) setProducts(data.slice(0, 4));
+      })
+      .catch(() => {});
+  }, []);
+
+  const wishlistProducts = products.length > 0 ? products : mockProducts.slice(0, 4);
 
   return (
     <div className="space-y-6 font-sans text-slate-800">

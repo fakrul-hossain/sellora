@@ -31,6 +31,7 @@ export enum PaymentMethod {
   BKASH = 'BKASH',
   NAGAD = 'NAGAD',
   STRIPE = 'STRIPE',
+  STRIPE_CARD = 'STRIPE_CARD',
 }
 
 export enum Currency {

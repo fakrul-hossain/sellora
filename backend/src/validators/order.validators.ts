@@ -22,7 +22,9 @@ export const shippingAddressSchema = z.object({
 export const createOrderSchema = z.object({
   items: z.array(createOrderItemSchema).min(1, 'Cart cannot be empty'),
   shippingAddress: shippingAddressSchema,
-  paymentMethod: z.enum(['CASH_ON_DELIVERY', 'SSL_COMMERZ', 'BKASH', 'NAGAD', 'STRIPE']),
+  paymentMethod: z
+    .enum(['CASH_ON_DELIVERY', 'SSL_COMMERZ', 'BKASH', 'NAGAD', 'STRIPE', 'STRIPE_CARD'])
+    .transform((val) => (val === 'STRIPE_CARD' ? 'STRIPE' : val)),
 });
 
 export const updateOrderStatusSchema = z.object({

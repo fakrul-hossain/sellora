@@ -33,6 +33,9 @@ const envSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),
+
+  STRIPE_SECRET_KEY: z.string().default('sk_test_mock_secret_key'),
+  STRIPE_PUBLISHABLE_KEY: z.string().default('pk_test_mock_pub_key'),
 });
 
 const parseEnv = () => {

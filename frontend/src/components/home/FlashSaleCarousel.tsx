@@ -5,10 +5,24 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Flame, Clock, ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
 import { mockProducts } from '@/lib/products-data';
+import { ApiClient } from '@/lib/api-client';
 import { SelloraProductCard } from '@/components/common/SelloraProductCard';
 
-export function FlashSaleCarousel() {
+export function FlashSaleCarousel({ products }: { products?: any[] } = {}) {
   const [timeLeft, setTimeLeft] = useState({ hours: 5, minutes: 42, seconds: 18 });
+  const [liveProducts, setLiveProducts] = useState<any[]>(products || []);
+
+  useEffect(() => {
+    if (products && products.length > 0) {
+      setLiveProducts(products);
+    } else {
+      ApiClient.get<any[]>('/products')
+        .then((data) => {
+          if (data && data.length > 0) setLiveProducts(data.slice(0, 6));
+        })
+        .catch(() => {});
+    }
+  }, [products]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -22,7 +36,7 @@ export function FlashSaleCarousel() {
     return () => clearInterval(timer);
   }, []);
 
-  const flashProducts = mockProducts.slice(0, 5);
+  const flashProducts = liveProducts.length > 0 ? liveProducts.slice(0, 6) : mockProducts.slice(0, 5);
 
   return (
     <section className="py-8 sm:py-12 bg-[#FAFAFA] relative overflow-hidden">

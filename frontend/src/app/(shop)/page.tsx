@@ -1,6 +1,6 @@
 'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ApiClient } from '@/lib/api-client';
 import { mockProducts } from '@/lib/products-data';
 
 import { StorefrontHeader, MobileBottomBar, StorefrontFooter } from '@/components/layout';
@@ -18,19 +18,53 @@ import { SelloraProductCard } from '@/components/common/SelloraProductCard';
 
 export default function RedesignedStorefrontPage() {
   const [activeTab, setActiveTab] = useState<'trending' | 'new' | 'budget' | 'all'>('trending');
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const trendingProducts = mockProducts.slice(0, 6);
-  const newArrivals = mockProducts.slice(2, 8);
-  const budgetDeals = mockProducts.filter((p) => p.price < 2000);
+  useEffect(() => {
+    async function loadStorefrontProducts() {
+      try {
+        setIsLoading(true);
+        const data = await ApiClient.get<any[]>('/products');
+        if (data && data.length > 0) {
+          setDbProducts(data);
+        }
+      } catch (err) {
+        console.error('Failed to load database products:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadStorefrontProducts();
+  }, []);
+
+  const effectiveProducts = dbProducts.length > 0 ? dbProducts : mockProducts;
+
+  // 1. Trending: Top rated products
+  const trendingProducts = [...effectiveProducts]
+    .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
+    .slice(0, 12);
+
+  // 2. New Arrivals: Sorted by latest created date / ID descending so new vendor products appear first
+  const newArrivals = [...effectiveProducts]
+    .sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : Number(a.id) || 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : Number(b.id) || 0;
+      return timeB - timeA;
+    })
+    .slice(0, 12);
+
+  // 3. Under 2,000 Budget Deals
+  const budgetDeals = effectiveProducts.filter((p) => Number(p.price) < 2000).slice(0, 12);
 
   const getActiveProducts = () => {
     switch (activeTab) {
       case 'new':
         return newArrivals;
       case 'budget':
-        return budgetDeals;
+        return budgetDeals.length > 0 ? budgetDeals : effectiveProducts.slice(0, 12);
       case 'all':
-        return mockProducts;
+        return effectiveProducts;
       case 'trending':
       default:
         return trendingProducts;
@@ -54,7 +88,7 @@ export default function RedesignedStorefrontPage() {
         <BrandWeekBanner />
 
         {/* 4. Flash Sale Carousel with Live Timer & Stock Progress */}
-        <FlashSaleCarousel />
+        <FlashSaleCarousel products={effectiveProducts.slice(0, 8)} />
 
 
         {/* 4. Tech Category Bento Grid */}

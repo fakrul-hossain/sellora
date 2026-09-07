@@ -5,8 +5,14 @@ import { createProductSchema, updateProductSchema } from '../validators/product.
 
 export class ProductController {
   public static list = async (req: Request, res: Response) => {
-    const { category, search, vendorId } = req.query as Record<string, string>;
-    const products = await ProductService.listProducts({ category, search, vendorId });
+    const { category, search, vendorId, includeUnapproved, status } = req.query as Record<string, string>;
+    const products = await ProductService.listProducts({
+      category,
+      search,
+      vendorId,
+      includeUnapproved: includeUnapproved === 'true' || Boolean(vendorId),
+      status,
+    });
     return ApiResponseBuilder.success(res, 'Products fetched successfully', products);
   };
 

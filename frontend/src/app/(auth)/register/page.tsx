@@ -46,7 +46,10 @@ function RegisterContent() {
       login(data.token, data.user);
       toast.success(`Account registered successfully! Welcome to SELLORA, ${name.split(' ')[0]}.`, 'Registration Successful');
 
-      if (data.user.role === 'SELLER') {
+      const redirectUrl = searchParams.get('redirect');
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else if (data.user.role === 'SELLER') {
         router.push('/seller');
       } else {
         router.push('/dashboard');

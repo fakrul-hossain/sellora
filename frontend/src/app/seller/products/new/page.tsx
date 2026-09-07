@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ApiClient } from '@/lib/api-client';
 import { useToast } from '@/components/ui/toast';
 import { CloudinaryImageUploader, RichTextEditor } from '@/components/common';
-import { PlusCircle, ArrowLeft, Save, Video, Package, Shield, ListPlus, Trash2 } from 'lucide-react';
+import { PlusCircle, ArrowLeft, Save, Video, Package, Shield, ListPlus, Trash2, Image as ImageIcon, Plus, Star } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AddProductPage() {
@@ -19,11 +19,14 @@ export default function AddProductPage() {
   const [originalPrice, setOriginalPrice] = useState('');
   const [stock, setStock] = useState('10');
   const [sku, setSku] = useState('');
-  const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000');
+  const [imageUrl, setImageUrl] = useState('');
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [newGalleryUrl, setNewGalleryUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [description, setDescription] = useState('');
   const [inTheBox, setInTheBox] = useState('1x Main Unit, 1x User Manual, 1x Charging Cable');
   const [warranty, setWarranty] = useState('1 Year Official Brand Warranty');
+  const [submitError, setSubmitError] = useState<string | null>(null);
   
   // Specifications KV List
   const [specs, setSpecs] = useState<{ label: string; value: string }[]>([
@@ -47,8 +50,30 @@ export default function AddProductPage() {
     setSpecs(next);
   };
 
+  const handleAddGalleryImage = (urlToAdd?: string) => {
+    const target = (urlToAdd || newGalleryUrl).trim();
+    if (!target) return;
+    if (!imageUrl) {
+      setImageUrl(target);
+    } else if (!galleryImages.includes(target) && target !== imageUrl) {
+      setGalleryImages((prev) => [...prev, target]);
+    }
+    setNewGalleryUrl('');
+  };
+
+  const handleRemoveGalleryImage = (index: number) => {
+    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSetAsPrimary = (imgToMakePrimary: string) => {
+    const oldPrimary = imageUrl;
+    setImageUrl(imgToMakePrimary);
+    setGalleryImages((prev) => prev.map((img) => (img === imgToMakePrimary ? oldPrimary : img)));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
 
     if (!title.trim()) { toast.error('Product title is required'); return; }
     if (!brand.trim()) { toast.error('Brand name is required'); return; }
@@ -67,6 +92,11 @@ export default function AddProductPage() {
       ? [{ category: 'General Information', items: specs.filter(s => s.label.trim() && s.value.trim()) }]
       : null;
 
+    const allSubmittedImages = [
+      imageUrl.trim(),
+      ...galleryImages.filter((img) => img.trim() && img.trim() !== imageUrl.trim()),
+    ];
+
     try {
       await ApiClient.post('/vendors/products', {
         title,
@@ -75,8 +105,9 @@ export default function AddProductPage() {
         price: parseFloat(price),
         originalPrice: originalPrice ? parseFloat(originalPrice) : parseFloat(price),
         stock: parseInt(stock, 10),
-        sku,
-        imageUrl,
+        sku: sku.trim(),
+        imageUrl: imageUrl.trim(),
+        images: allSubmittedImages,
         videoUrl: videoUrl.trim() || undefined,
         description,
         inTheBox,
@@ -84,10 +115,12 @@ export default function AddProductPage() {
         specifications: formattedSpecs,
       });
 
-      toast.success('Product submitted! Awaiting Admin confirmation to publish on Sellora.', 'Request Submitted');
+      toast.success('Product submitted! It is now pending admin review before going live.', 'Product Created');
       router.push('/seller/products');
     } catch (err: any) {
-      toast.error(err.message || 'Failed to submit product listing', 'Submission Failed');
+      const errorMsg = err.message || 'Failed to submit product listing. Please check the fields and try again.';
+      setSubmitError(errorMsg);
+      toast.error(errorMsg, 'Submission Failed');
     } finally {
       setIsSubmitting(false);
     }
@@ -112,6 +145,18 @@ export default function AddProductPage() {
             Fill in all required product details. Submitted products will be reviewed by Sellora Admin before appearing on the main website.
           </p>
         </div>
+
+        {submitError && (
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3 animate-in fade-in">
+            <div className="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0 font-black text-xs">
+              !
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-xs font-black uppercase tracking-wider text-rose-900">Submission Error</h4>
+              <p className="text-xs font-semibold text-rose-700">{submitError}</p>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6 text-xs font-bold">
           
@@ -218,12 +263,94 @@ export default function AddProductPage() {
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-brand-primary">2. Product Media (Images & Video)</h3>
 
             <CloudinaryImageUploader
-              label="Featured Product Image (Cloudinary Upload / URL) *"
+              label="Featured / Main Product Image (Cloudinary Upload / URL) *"
               value={imageUrl}
               onChange={setImageUrl}
               folder="products"
               placeholder="Click or drag product image to upload to Cloudinary"
             />
+
+            {/* Multiple Gallery Images */}
+            <div className="space-y-3 pt-2 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <div>
+                  <label className="block text-slate-800 font-extrabold text-xs flex items-center gap-1.5">
+                    <ImageIcon className="w-4 h-4 text-brand-primary" />
+                    <span>Additional Gallery Images ({galleryImages.length} added)</span>
+                  </label>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    Upload or paste additional product photo URLs (angles, packaging, unboxing views).
+                  </p>
+                </div>
+              </div>
+
+              {/* Add New Gallery Image Row */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <input
+                  type="url"
+                  placeholder="Paste additional image URL (e.g. https://...)"
+                  value={newGalleryUrl}
+                  onChange={(e) => setNewGalleryUrl(e.target.value)}
+                  className="flex-1 p-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-brand-primary text-xs"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAddGalleryImage()}
+                  disabled={!newGalleryUrl.trim()}
+                  className="px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-hover disabled:bg-slate-200 disabled:text-slate-400 text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Image URL</span>
+                </button>
+              </div>
+
+              {/* Quick Cloudinary Upload for Gallery */}
+              <div className="pt-2 border-t border-slate-200/60">
+                <span className="text-[11px] text-slate-500 font-bold block mb-1.5">Or upload gallery photos directly to Cloudinary:</span>
+                <CloudinaryImageUploader
+                  label="Upload Additional Photo"
+                  value=""
+                  onChange={(uploadedUrl) => {
+                    if (uploadedUrl) handleAddGalleryImage(uploadedUrl);
+                  }}
+                  folder="products/gallery"
+                  placeholder="Click to upload an additional gallery picture"
+                />
+              </div>
+
+              {/* Gallery Thumbnails List */}
+              {galleryImages.length > 0 && (
+                <div className="pt-3 border-t border-slate-200/60 space-y-2">
+                  <span className="text-[11px] font-extrabold text-slate-700 block">Uploaded Gallery Pictures:</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {galleryImages.map((img, idx) => (
+                      <div key={idx} className="relative group rounded-xl border border-slate-200 bg-white p-2 flex flex-col items-center space-y-1.5 shadow-2xs">
+                        <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-24 object-contain rounded-lg bg-slate-50" />
+                        <div className="w-full flex items-center justify-between text-[10px] pt-1">
+                          <button
+                            type="button"
+                            onClick={() => handleSetAsPrimary(img)}
+                            className="text-brand-primary font-black hover:underline cursor-pointer flex items-center gap-0.5"
+                            title="Make this the primary storefront image"
+                          >
+                            <Star className="w-3 h-3" />
+                            <span>Make Main</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveGalleryImage(idx)}
+                            className="text-rose-600 font-black hover:text-rose-800 p-1 cursor-pointer"
+                            title="Delete image"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div>
               <label className="block text-slate-700 mb-1 flex items-center gap-1.5">

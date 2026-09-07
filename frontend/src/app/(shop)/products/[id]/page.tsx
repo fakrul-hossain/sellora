@@ -31,59 +31,144 @@ import {
 export default function ProductDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const productId = Array.isArray(params.id) ? params.id[0] : params.id || 'remax-200h';
+  const productId = Array.isArray(params.id) ? params.id[0] : params.id || '';
 
-  const [productData, setProductData] = useState<any>(() => getProductById(productId));
+  const [productData, setProductData] = useState<any>(null);
+  const [catalogProducts, setCatalogProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch real backend data if available
-  useEffect(() => {
-    async function fetchBackendProduct() {
-      try {
-        const data = await ApiClient.get<any>(`/products/${productId}`);
-        if (data && data.id) {
-          setProductData((prev: any) => ({
-            ...prev,
-            ...data,
-            title: data.title || prev.title,
-            price: data.price ? Number(data.price) : prev.price,
-            originalPrice: data.originalPrice ? Number(data.originalPrice) : prev.originalPrice,
-            stock: data.stock !== undefined ? Number(data.stock) : prev.stock,
-            description: data.description || prev.description,
-            imageUrl: data.imageUrl || prev.imageUrl,
-            videoUrl: data.videoUrl || prev.videoUrl,
-            inTheBox: data.inTheBox || prev.inTheBox,
-            warranty: data.warranty || prev.warranty,
-            specifications: data.specifications || prev.specifications,
-          }));
-        }
-      } catch (err) {
-        // Use local fallback item if numeric ID fetch fails
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchBackendProduct();
-  }, [productId]);
-
-  const product = productData;
+  const [hasError, setHasError] = useState(false);
 
   // Variant States
-  const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(
-    product.colorVariants?.[0]
-  );
-  const [selectedVersion, setSelectedVersion] = useState<OptionVariant | undefined>(
-    product.versionVariants?.[0]
-  );
+  const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(undefined);
+  const [selectedVersion, setSelectedVersion] = useState<OptionVariant | undefined>(undefined);
 
   // Modals
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  // Fetch real backend product details & catalog
+  useEffect(() => {
+    async function fetchBackendProduct() {
+      if (!productId) return;
+      setIsLoading(true);
+      setHasError(false);
+      try {
+        const data = await ApiClient.get<any>(`/products/${productId}`);
+        if (data && data.id) {
+          const productImages = (data.images && data.images.length > 0)
+            ? data.images.filter(Boolean)
+            : (data.imageUrl ? [data.imageUrl] : []);
+
+          const formatted = {
+            id: String(data.id),
+            title: data.title,
+            brand: data.brand || 'Sellora Direct',
+            category: data.category || 'General',
+            price: Number(data.price || 0),
+            originalPrice: data.originalPrice ? Number(data.originalPrice) : Number(data.price || 0),
+            discountPercentage: data.discountPercentage || 0,
+            stock: Number(data.stock !== undefined ? data.stock : 10),
+            stockCount: Number(data.stock !== undefined ? data.stock : 10),
+            inStock: (Number(data.stock) > 0 || data.stock === undefined),
+            rating: data.rating ? Number(data.rating) : 4.8,
+            reviewCount: data.reviewCount ? Number(data.reviewCount) : 12,
+            soldCount: data.soldCount || 45,
+            sku: data.sku || `SKU-${data.id}`,
+            description: data.description || '',
+            imageUrl: data.imageUrl || (productImages[0] || ''),
+            galleryImages: productImages,
+            images: productImages,
+            videoUrl: data.videoUrl || undefined,
+            inTheBox: data.inTheBox || '1x Standard Unit, 1x User Documentation',
+            warranty: data.warranty || 'Official Brand Warranty',
+            specifications: data.specifications || undefined,
+            features: data.features || [],
+            vendorId: data.vendorId || '1',
+            isVerifiedOfficialStore: true,
+            colorVariants: data.colorVariants || [],
+            versionVariants: data.versionVariants || [],
+          };
+
+          setProductData(formatted);
+          if (formatted.colorVariants.length > 0) {
+            setSelectedColor(formatted.colorVariants[0]);
+          }
+          if (formatted.versionVariants.length > 0) {
+            setSelectedVersion(formatted.versionVariants[0]);
+          }
+        } else {
+          setHasError(true);
+        }
+      } catch (err) {
+        setHasError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    async function fetchCatalogForRelated() {
+      try {
+        const allItems = await ApiClient.get<any[]>('/products');
+        if (allItems && allItems.length > 0) {
+          setCatalogProducts(allItems);
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
+    fetchBackendProduct();
+    fetchCatalogForRelated();
+  }, [productId]);
+
   const priceDelta = selectedVersion?.priceDelta || 0;
 
-  const relatedProducts = mockProducts.filter((p) => p.id !== product.id).slice(0, 6);
-  const recentlyViewed = mockProducts.filter((p) => p.id !== product.id).slice(2, 6);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] flex flex-col justify-between font-sans antialiased">
+        <main className="flex-1 py-8">
+          <div className="max-w-[1536px] mx-auto px-4 sm:px-6 space-y-8 animate-pulse">
+            <div className="h-4 w-48 bg-slate-200 rounded-full" />
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-6 space-y-4">
+                <div className="h-[440px] bg-slate-100 rounded-3xl" />
+              </div>
+              <div className="lg:col-span-6 space-y-6">
+                <div className="h-6 w-32 bg-slate-200 rounded-full" />
+                <div className="h-10 w-3/4 bg-slate-200 rounded-2xl" />
+                <div className="h-28 bg-slate-100 rounded-2xl" />
+                <div className="h-14 bg-slate-200 rounded-2xl" />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!productData || hasError) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center font-sans text-center px-4 space-y-4">
+        <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto text-2xl font-black">
+          !
+        </div>
+        <h2 className="text-xl font-black text-slate-900">Product Not Found</h2>
+        <p className="text-xs text-slate-500 max-w-sm">
+          The requested product could not be located in the catalog. It may have been removed or requires admin approval.
+        </p>
+        <Link
+          href="/"
+          className="px-6 py-2.5 rounded-full bg-brand-primary text-white font-extrabold text-xs shadow-sm hover:bg-brand-primary-hover transition-all"
+        >
+          Return to Marketplace
+        </Link>
+      </div>
+    );
+  }
+
+  const product = productData;
+  const relatedProducts = catalogProducts.filter((p) => String(p.id) !== String(product.id)).slice(0, 6);
+  const recentlyViewed = catalogProducts.filter((p) => String(p.id) !== String(product.id)).slice(2, 6);
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex flex-col justify-between font-sans text-slate-800 antialiased">

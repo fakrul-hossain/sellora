@@ -65,11 +65,44 @@ export class ProductRepository {
     return rows.length > 0 ? rows[0] : null;
   }
 
-  public static async findAll(query: { category?: string; search?: string; vendorId?: string; includeUnapproved?: boolean }): Promise<ProductRow[]> {
+  public static async findBySku(sku: string): Promise<ProductRow | null> {
+    if (!sku || !sku.trim()) return null;
+    const sql = `SELECT * FROM products WHERE LOWER(sku) = LOWER(?) LIMIT 1`;
+    const rows = await mysqlClient.query<ProductRow[]>(sql, [sku.trim()]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  public static async getProductImages(productId: number | string): Promise<string[]> {
+    const numericId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
+    if (isNaN(numericId)) return [];
+
+    try {
+      const rows = await mysqlClient.query<any[]>(
+        `SELECT image_url FROM product_images WHERE product_id = ? ORDER BY sort_order ASC, id ASC`,
+        [numericId]
+      );
+      return rows.map((r) => r.image_url);
+    } catch {
+      return [];
+    }
+  }
+
+  public static async findAll(query: { category?: string; search?: string; vendorId?: string; includeUnapproved?: boolean; status?: string }): Promise<ProductRow[]> {
     const whereConditions: string[] = ['is_published = 1'];
-    if (!query.includeUnapproved) {
+    
+    // When vendorId is specified, the vendor must see all their products (both pending & approved)
+    if (!query.includeUnapproved && !query.vendorId) {
       whereConditions.push('is_approved = 1');
     }
+
+    if (query.status) {
+      if (query.status.toUpperCase() === 'APPROVED' || query.status.toUpperCase() === 'ACCEPTED') {
+        whereConditions.push('is_approved = 1');
+      } else if (query.status.toUpperCase() === 'PENDING') {
+        whereConditions.push('is_approved = 0');
+      }
+    }
+
     const params: any[] = [];
 
     if (query.vendorId) {
@@ -113,6 +146,7 @@ export class ProductRepository {
     stock: number;
     sku?: string;
     imageUrl?: string;
+    images?: string[];
     videoUrl?: string;
     specifications?: any;
     inTheBox?: string;
@@ -122,7 +156,7 @@ export class ProductRepository {
   }): Promise<ProductRow> {
     const numericVendorId = typeof product.vendorId === 'string' ? parseInt(product.vendorId, 10) : product.vendorId;
     const generatedSku = product.sku || `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const defaultImage = product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000';
+    const defaultImage = product.imageUrl || (product.images && product.images[0]) || '';
     const isApprovedVal = product.isApproved !== undefined ? (product.isApproved ? 1 : 0) : 0;
 
     const sql = `
@@ -156,7 +190,29 @@ export class ProductRepository {
       isApprovedVal,
     ]);
 
-    const created = await this.findById(result.insertId);
+    const newProductId = result.insertId;
+
+    // Save multiple images into product_images table
+    const allImagesToInsert = (product.images && product.images.length > 0)
+      ? product.images
+      : [defaultImage];
+
+    for (let i = 0; i < allImagesToInsert.length; i++) {
+      const img = allImagesToInsert[i];
+      if (img && typeof img === 'string' && img.trim()) {
+        try {
+          await mysqlClient.execute(
+            `INSERT INTO product_images (product_id, image_url, is_primary, sort_order)
+             VALUES (?, ?, ?, ?)`,
+            [newProductId, img.trim(), i === 0 ? 1 : 0, i]
+          );
+        } catch {
+          // Ignore individual image insertion error
+        }
+      }
+    }
+
+    const created = await this.findById(newProductId);
     if (!created) throw new Error('Failed to create product.');
     return created;
   }

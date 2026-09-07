@@ -1,48 +1,43 @@
 import { Response } from 'express';
-import { ApiResponse } from '../types/api.types.js';
-import { HttpStatus, HttpStatusCode } from './http-status.js';
-import { requestContext } from './async-context.js';
 
+/**
+ * Standard API response helper for sending consistent JSON responses
+ * Format: { success: boolean, message: string, data: any }
+ */
 export class ApiResponseBuilder {
   public static success<T>(
     res: Response,
     message: string,
     data?: T,
-    statusCode: HttpStatusCode = HttpStatus.OK,
+    statusCode: number = 200,
     meta?: Record<string, any>
   ): Response {
-    const traceId = requestContext.getTraceId();
-    const payload: ApiResponse<T> = {
+    return res.status(statusCode).json({
       success: true,
       statusCode,
       message,
       data,
       meta,
-      traceId,
       timestamp: new Date().toISOString(),
-    };
-    return res.status(statusCode).json(payload);
+    });
   }
 
   public static created<T>(res: Response, message: string, data?: T): Response {
-    return this.success(res, message, data, HttpStatus.CREATED);
+    return this.success(res, message, data, 201);
   }
 
   public static error(
     res: Response,
     message: string,
-    statusCode: HttpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR,
+    statusCode: number = 500,
     errors?: any[]
   ): Response {
-    const traceId = requestContext.getTraceId();
-    const payload: ApiResponse = {
+    return res.status(statusCode).json({
       success: false,
       statusCode,
       message,
       errors,
-      traceId,
       timestamp: new Date().toISOString(),
-    };
-    return res.status(statusCode).json(payload);
+    });
   }
 }

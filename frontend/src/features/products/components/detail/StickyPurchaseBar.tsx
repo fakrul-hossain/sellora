@@ -6,6 +6,8 @@ import { ShoppingCart, Check, Sparkles, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ProductDetailItem } from '@/lib/products-data';
 import { useCart } from '@/providers/cart-context';
+import { useAuth } from '@/providers/auth-context';
+import { useToast } from '@/components/ui/toast';
 
 interface StickyPurchaseBarProps {
   product: ProductDetailItem;
@@ -22,6 +24,8 @@ export function StickyPurchaseBar({
 }: StickyPurchaseBarProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const toast = useToast();
   const [isVisible, setIsVisible] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -47,6 +51,12 @@ export function StickyPurchaseBar({
   };
 
   const handleBuyNow = () => {
+    if (!user) {
+      toast.info('Please log in to proceed with your purchase.', 'Login Required');
+      addToCart(product, 1, selectedColorName, selectedVersionName);
+      router.push('/login?redirect=/checkout');
+      return;
+    }
     addToCart(product, 1, selectedColorName, selectedVersionName);
     router.push('/checkout');
   };
